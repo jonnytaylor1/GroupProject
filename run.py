@@ -1,4 +1,4 @@
-import data
-import Quiz
 from UI.mainUI import run
-run()
+from Quiz.multiplechoice import Multiplechoice
+# run()
+Multiplechoice().run()

@@ -30,7 +30,6 @@ class Multiplechoice():
             yield (question["text"], choices, question["correct"])
 
     def run(self):
-        # while(True):
         for (question, choices, correct) in self.get_questions():
             print(question)
             print("Choices are: ")
@@ -38,4 +37,3 @@ class Multiplechoice():
                 print(f"{i + 1}. {choice}")
             ans = input("Select Answer: ")
             print("correct" if correct == ans.upper() else f"{ans} is incorrect. Correct is {correct}")
-            # input("Run again?")

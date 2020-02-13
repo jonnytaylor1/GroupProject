@@ -1,9 +1,17 @@
 from tkinter import *
-from UI.multiple_choice import MultipleChoice
+from UI.welcome import Welcome
+
+class MainUI(Frame):
+    def __init__(self, parent):
+        self.parent = parent
+        Frame.__init__(self, parent)
+        self.grid()
+
 
 root = Tk()
-root.title("Multiple Choice")
+root.title("Quiz")
 root.geometry("1000x500")
-MultipleChoice(root)
+m = MainUI(root)
+Welcome(m)
 def run():
     root.mainloop()

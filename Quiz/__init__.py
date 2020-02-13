@@ -1,0 +1,1 @@
+from Quiz.multiplechoice import Multiplechoice

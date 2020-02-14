@@ -42,3 +42,5 @@ class MultipleChoice(Frame):
         tkinter.messagebox.showinfo("Answer submitted",
                                     f"{choice} is correct!" if choice == correct else f"Sorry, the correct answer is {correct}")
         self.load_questions()
+
+

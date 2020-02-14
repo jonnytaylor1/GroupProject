@@ -21,7 +21,8 @@ class Multiplechoice():
     def add_question(self, q):
         b, c, d = q["incorrect"]
         with Connection() as con:
-            con.execute("INSERT INTO questions(question, correct, incorrect1, incorrect2, incorrect3) values (?,?,?,?,?)", (q["text"], q["correct"], b, c, d))
+            with con:
+                con.execute("INSERT INTO questions(question, correct, incorrect1, incorrect2, incorrect3) values (?,?,?,?,?)", (q["text"], q["correct"], b, c, d))
 
     def get_questions(self):
         for question in self.qbank:
@@ -37,3 +38,9 @@ class Multiplechoice():
                 print(f"{i + 1}. {choice}")
             ans = input("Select Answer: ")
             print("correct" if correct == ans.upper() else f"{ans} is incorrect. Correct is {correct}")
+
+
+def get_question(id):
+    with Connection() as con:
+        with con:
+            return con.execute("SELECT question, correct, incorrect1, incorrect2, incorrect3 from questions WHERE id = ?", str(id)).fetchone()

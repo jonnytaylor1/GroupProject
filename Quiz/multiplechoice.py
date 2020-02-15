@@ -10,8 +10,8 @@ class Multiplechoice():
 
     def load_questions(self):
         with Connection() as con:
-            for question_text, correct, b, c, d in con.execute("SELECT question, correct, incorrect1, incorrect2, incorrect3 from questions"):
-                self.qbank.append({"text": question_text, "correct": correct, "incorrect": [b,c,d]})
+            for id, question_text, correct, b, c, d in con.execute("SELECT * from questions"):
+                self.qbank.append({"text": question_text, "correct": correct, "incorrect": [b,c,d], "id": id})
 
     def ensure_table_exists(self):
         with Connection() as con:
@@ -43,4 +43,8 @@ class Multiplechoice():
 def get_question(id):
     with Connection() as con:
         with con:
-            return con.execute("SELECT question, correct, incorrect1, incorrect2, incorrect3 from questions WHERE id = ?", str(id)).fetchone()
+            return con.execute("SELECT id, question, correct, incorrect1, incorrect2, incorrect3 from questions WHERE id = ?", str(id)).fetchone()
+def save_question(id, question, correct, inc1, inc2, inc3):
+    with Connection() as con:
+        with con:
+            con.execute("UPDATE questions SET question = ?, correct = ?, incorrect1 = ?, incorrect2 = ?, incorrect3 = ? WHERE id = ?", (question, correct, inc1, inc2, inc3, str(id)))

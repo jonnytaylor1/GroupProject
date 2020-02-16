@@ -34,7 +34,7 @@ class Settings(Frame):
 
     def save_q(self):
         in_choices = list(map(lambda el: el.get(), self.question["incorrect"]))
-        save_question(self.question["id"], self.question["text"].get("1.0", END), self.question["correct"])
+        save_question(self.question["id"], self.question["text"].get("1.0", END), self.question["correct"].get(), *in_choices)
         self.refresh()
 
     def edit_q(self, row, id):

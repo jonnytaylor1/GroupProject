@@ -48,3 +48,7 @@ def save_question(id, question, correct, inc1, inc2, inc3):
     with Connection() as con:
         with con:
             con.execute("UPDATE questions SET question = ?, correct = ?, incorrect1 = ?, incorrect2 = ?, incorrect3 = ? WHERE id = ?", (question, correct, inc1, inc2, inc3, str(id)))
+def delete_question(id):
+    with Connection() as con:
+        with con:
+            con.execute("DELETE from questions WHERE id = ?", (str(id),))

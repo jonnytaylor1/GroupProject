@@ -1,5 +1,5 @@
 from tkinter import *
-from Quiz.multiplechoice import Multiplechoice, get_question, save_question
+from Quiz.multiplechoice import Multiplechoice, get_question, save_question, delete_question
 
 class Settings(Frame):
     def __init__(self, parent):
@@ -28,7 +28,7 @@ class Settings(Frame):
             b_edit = Button(self, text = "Edit")
             b_edit.grid(row = row, column = 7)
             b_edit["command"] = lambda row=row, id = q["id"]: self.edit_q(row, id)
-            Button(self, text="Delete").grid(row=row, column=8)
+            Button(self, text="Delete", command=lambda id = q["id"]: self.del_q(id)).grid(row=row, column=8)
         self.b_add = Button(self, text = "Add new Question", command= lambda: self.create_q_form(15))
         self.b_add.grid(row = 14, column = 3)
 
@@ -49,7 +49,8 @@ class Settings(Frame):
 
 
     def del_q(self, i):
-        pass
+        delete_question(i)
+        self.refresh()
 
 
 

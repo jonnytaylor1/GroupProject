@@ -1,15 +1,15 @@
 from tkinter import *
-from UI.welcome import Welcome
-from UI.settings import Settings
-from UI.multiple_choice import MultipleChoice
+from UI import *
 
 class MainUI():
     def __init__(self):
         self.root = Tk()
         self.root.title("Quiz")
         self.root.geometry("1000x500")
-        self.pages = [Welcome(self), Settings(self), MultipleChoice(self)]
-        self.curr_window = self.pages[0]
+        self.pages = {"Welcome": Welcome(self),
+                      "Settings": Settings(self),
+                      "MultipleChoice": MultipleChoice(self)}
+        self.curr_window = self.pages["Welcome"]
 
     def run(self):
         self.curr_window.grid()

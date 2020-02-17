@@ -1,5 +1,5 @@
 from tkinter import *
-from Quiz.multiplechoice import Multiplechoice, get_question, save_question, delete_question
+from Quiz.multiplechoice import Multiplechoice
 
 class Settings(Frame):
     def __init__(self, parent):
@@ -20,8 +20,9 @@ class Settings(Frame):
         Label(self.subFrame, text="Incorrect choice 1", font = h_font).grid(row=h_row, column=4)
         Label(self.subFrame, text="Incorrect choice 2", font = h_font).grid(row=h_row, column=5)
         Label(self.subFrame, text="Incorrect choice 3", font = h_font).grid(row=h_row, column=6)
+        row = 2
         for i, q in enumerate(Multiplechoice().qbank):
-            row = 2 + i
+            row += i
             Label(self.subFrame, text = q["text"]).grid(row=row, column=2)
             Label(self.subFrame, text = q["correct"]).grid(row = row, column =3)
             Label(self.subFrame, text= q["incorrect"][0]).grid(row = row, column = 4)
@@ -31,23 +32,23 @@ class Settings(Frame):
             b_edit.grid(row = row, column = 7)
             b_edit["command"] = lambda row=row, id = q["id"]: self.edit_q(row, id)
             Button(self.subFrame, text="Delete", command=lambda id = q["id"]: self.del_q(id)).grid(row=row, column=8)
-        self.b_add = Button(self.subFrame, text = "Add new Question", command= lambda: self.create_q_form(15))
-        self.b_add.grid(row = 14, column = 3)
-        Button(self.subFrame, text = "Back", command = self.go_menu).grid(row = 16, column = 3)
-        Button(self.subFrame, text = "Refresh", command = self.refresh).grid(row = 17, column = 3)
+        self.b_add = Button(self.subFrame, text = "Add new Question", command= lambda: self.create_q_form(row + 1))
+        self.b_add.grid(row = row + 1, column = 3)
+        Button(self.subFrame, text = "Back", command = self.go_menu).grid(row = row + 2, column = 3)
+        Button(self.subFrame, text = "Refresh", command = self.refresh).grid(row = row + 3, column = 3)
 
     def go_menu(self):
         self.grid_forget()
-        self.parent.pages[0].grid()
+        self.parent.pages["Welcome"].grid()
 
     def save_q(self):
         in_choices = list(map(lambda el: el.get(), self.question["incorrect"]))
-        save_question(self.question["id"], self.question["text"].get("1.0", END), self.question["correct"].get(), *in_choices)
+        Multiplechoice.save_question(self.question["id"], self.question["text"].get("1.0", END).rstrip(), self.question["correct"].get(), *in_choices)
         self.refresh()
 
     def edit_q(self, row, id):
         self.create_q_form(row)
-        self.question["id"], text, correct, inc1, inc2, inc3 = get_question(id)
+        self.question["id"], text, correct, inc1, inc2, inc3 = Multiplechoice.get_question(id)
         self.question["text"].insert(END, text)
         self.question["correct"].set(correct)
         self.question["incorrect"][0].set(inc1)
@@ -57,7 +58,7 @@ class Settings(Frame):
 
 
     def del_q(self, i):
-        delete_question(i)
+        Multiplechoice.delete_question(i)
         self.refresh()
 
 
@@ -68,7 +69,7 @@ class Settings(Frame):
 
 
 
-        self.question["text"] = Text(self.subFrame, width = 30, height = 2)
+        self.question["text"] = Text(self.subFrame, width = 30, height = 1)
         self.question["text"].grid(row = new_row, column = 2)
 
         c_entry = Entry(self.subFrame, textvariable = self.question["correct"])
@@ -88,7 +89,7 @@ class Settings(Frame):
 
     def send_q_data(self):
         in_choices = list(map( lambda el: el.get(), self.question["incorrect"]))
-        q = {"text": self.question["text"].get("1.0", END), "correct": self.question["correct"].get(), "incorrect": in_choices}
+        q = {"text": self.question["text"].get("1.0", END).rstrip(), "correct": self.question["correct"].get(), "incorrect": in_choices}
         Multiplechoice.add_question(q)
         self.refresh()
 

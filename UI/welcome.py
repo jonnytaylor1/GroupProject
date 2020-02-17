@@ -1,6 +1,4 @@
 from tkinter import *
-from UI.multiple_choice import MultipleChoice
-from UI.settings import Settings
 class Welcome(Frame):
     def __init__(self, parent):
         self.parent = parent
@@ -19,8 +17,8 @@ class Welcome(Frame):
 
     def start_quiz(self):
         self.grid_forget()
-        self.parent.pages[2].grid()
+        self.parent.pages["MultipleChoice"].show()
 
     def go_to_settings(self):
         self.grid_forget()
-        self.parent.pages[1].grid()
+        self.parent.pages["Settings"].grid()

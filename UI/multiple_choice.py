@@ -6,8 +6,10 @@ class MultipleChoice(Frame):
     def __init__(self, parent):
         self.parent = parent
         Frame.__init__(self, parent.root)
-        self.qIter = Multiplechoice().get_questions()
         self.num = 0
+
+    def show(self):
+        self.grid()
         self.create_questions()
 
 
@@ -26,6 +28,10 @@ class MultipleChoice(Frame):
         except StopIteration:
             pass
     def load_questions(self):
+        try:
+            self.qIter
+        except AttributeError:
+            self.qIter = Multiplechoice().get_questions()
         try:
             q_text, choices, correct = next(self.qIter)
             self.num += 1

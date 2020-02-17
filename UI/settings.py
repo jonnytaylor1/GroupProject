@@ -3,10 +3,8 @@ from Quiz.multiplechoice import Multiplechoice
 
 class Settings(Frame):
     def __init__(self, parent):
-        self.parent = parent
         Frame.__init__(self, parent.root)
-        # self.create_q_form()
-
+        self.parent = parent
         self.list_qs()
 
 
@@ -20,18 +18,25 @@ class Settings(Frame):
         Label(self.subFrame, text="Incorrect choice 1", font = h_font).grid(row=h_row, column=4)
         Label(self.subFrame, text="Incorrect choice 2", font = h_font).grid(row=h_row, column=5)
         Label(self.subFrame, text="Incorrect choice 3", font = h_font).grid(row=h_row, column=6)
-        row = 2
+        row = 1
+        self.rows = []
         for i, q in enumerate(Multiplechoice().qbank):
-            row += i
-            Label(self.subFrame, text = q["text"]).grid(row=row, column=2)
-            Label(self.subFrame, text = q["correct"]).grid(row = row, column =3)
-            Label(self.subFrame, text= q["incorrect"][0]).grid(row = row, column = 4)
-            Label(self.subFrame, text = q["incorrect"][1]).grid(row = row, column = 5)
-            Label(self.subFrame, text = q["incorrect"][2]).grid(row = row, column = 6)
+            row += 1
+            l_text = Label(self.subFrame, text = q["text"])
+            l_text.grid(row=row, column=2)
+            l_correct = Label(self.subFrame, text = q["correct"])
+            l_correct.grid(row = row, column =3)
+            inc1 = Label(self.subFrame, text= q["incorrect"][0])
+            inc1.grid(row = row, column = 4)
+            inc2 = Label(self.subFrame, text = q["incorrect"][1])
+            inc2.grid(row = row, column = 5)
+            inc3 = Label(self.subFrame, text = q["incorrect"][2])
+            inc3.grid(row = row, column = 6)
             b_edit = Button(self.subFrame, text = "Edit")
             b_edit.grid(row = row, column = 7)
             b_edit["command"] = lambda row=row, id = q["id"]: self.edit_q(row, id)
             Button(self.subFrame, text="Delete", command=lambda id = q["id"]: self.del_q(id)).grid(row=row, column=8)
+            self.rows.append([l_text, l_correct, inc1, inc2, inc3])
         self.b_add = Button(self.subFrame, text = "Add new Question", command= lambda: self.create_q_form(row + 1))
         self.b_add.grid(row = row + 1, column = 3)
         Button(self.subFrame, text = "Back", command = self.go_menu).grid(row = row + 2, column = 3)
@@ -47,6 +52,8 @@ class Settings(Frame):
         self.refresh()
 
     def edit_q(self, row, id):
+        for label in self.rows[row - 2]:
+            label.grid_remove()
         self.create_q_form(row)
         self.question["id"], text, correct, inc1, inc2, inc3 = Multiplechoice.get_question(id)
         self.question["text"].insert(END, text)

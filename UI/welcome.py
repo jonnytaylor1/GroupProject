@@ -4,8 +4,7 @@ from UI.settings import Settings
 class Welcome(Frame):
     def __init__(self, parent):
         self.parent = parent
-        Frame.__init__(self, parent)
-        self.grid()
+        Frame.__init__(self, parent.root)
         self.create_welcome()
 
     def create_welcome(self):
@@ -19,9 +18,9 @@ class Welcome(Frame):
         b2["command"] = self.go_to_settings
 
     def start_quiz(self):
-        self.destroy()
-        MultipleChoice(self.parent)
+        self.grid_forget()
+        self.parent.pages[2].grid()
 
     def go_to_settings(self):
-        self.destroy()
-        Settings(self.parent)
+        self.grid_forget()
+        self.parent.pages[1].grid()

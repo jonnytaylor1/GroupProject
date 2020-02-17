@@ -18,7 +18,7 @@ class Multiplechoice():
             con.execute(
                 "CREATE TABLE IF NOT EXISTS questions (id INTEGER PRIMARY KEY, question TEXT, correct TEXT, incorrect1 TEXT, incorrect2 TEXT, incorrect3 TEXT)")
 
-    def add_question(self, q):
+    def add_question(q):
         b, c, d = q["incorrect"]
         with Connection() as con:
             with con:

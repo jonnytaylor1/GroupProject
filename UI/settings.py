@@ -4,33 +4,41 @@ from Quiz.multiplechoice import Multiplechoice, get_question, save_question, del
 class Settings(Frame):
     def __init__(self, parent):
         self.parent = parent
-        Frame.__init__(self, parent)
-        self.grid()
+        Frame.__init__(self, parent.root)
         # self.create_q_form()
+
         self.list_qs()
 
 
     def list_qs(self):
         h_row = 1
         h_font = ("MS", 10, "bold")
-        Label(self, text="Question Prompt", font = h_font).grid(row=h_row, column=2)
-        Label(self, text="Answer", font = h_font).grid(row=h_row, column=3)
-        Label(self, text="Incorrect choice 1", font = h_font).grid(row=h_row, column=4)
-        Label(self, text="Incorrect choice 2", font = h_font).grid(row=h_row, column=5)
-        Label(self, text="Incorrect choice 3", font = h_font).grid(row=h_row, column=6)
+        self.subFrame = Frame(self)
+        self.subFrame.grid()
+        Label(self.subFrame, text="Question Prompt", font = h_font).grid(row=h_row, column=2)
+        Label(self.subFrame, text="Answer", font = h_font).grid(row=h_row, column=3)
+        Label(self.subFrame, text="Incorrect choice 1", font = h_font).grid(row=h_row, column=4)
+        Label(self.subFrame, text="Incorrect choice 2", font = h_font).grid(row=h_row, column=5)
+        Label(self.subFrame, text="Incorrect choice 3", font = h_font).grid(row=h_row, column=6)
         for i, q in enumerate(Multiplechoice().qbank):
             row = 2 + i
-            Label(self, text = q["text"]).grid(row=row, column=2)
-            Label(self, text = q["correct"]).grid(row = row, column =3)
-            Label(self, text= q["incorrect"][0]).grid(row = row, column = 4)
-            Label(self, text = q["incorrect"][1]).grid(row = row, column = 5)
-            Label(self, text = q["incorrect"][2]).grid(row = row, column = 6)
-            b_edit = Button(self, text = "Edit")
+            Label(self.subFrame, text = q["text"]).grid(row=row, column=2)
+            Label(self.subFrame, text = q["correct"]).grid(row = row, column =3)
+            Label(self.subFrame, text= q["incorrect"][0]).grid(row = row, column = 4)
+            Label(self.subFrame, text = q["incorrect"][1]).grid(row = row, column = 5)
+            Label(self.subFrame, text = q["incorrect"][2]).grid(row = row, column = 6)
+            b_edit = Button(self.subFrame, text = "Edit")
             b_edit.grid(row = row, column = 7)
             b_edit["command"] = lambda row=row, id = q["id"]: self.edit_q(row, id)
-            Button(self, text="Delete", command=lambda id = q["id"]: self.del_q(id)).grid(row=row, column=8)
-        self.b_add = Button(self, text = "Add new Question", command= lambda: self.create_q_form(15))
+            Button(self.subFrame, text="Delete", command=lambda id = q["id"]: self.del_q(id)).grid(row=row, column=8)
+        self.b_add = Button(self.subFrame, text = "Add new Question", command= lambda: self.create_q_form(15))
         self.b_add.grid(row = 14, column = 3)
+        Button(self.subFrame, text = "Back", command = self.go_menu).grid(row = 16, column = 3)
+        Button(self.subFrame, text = "Refresh", command = self.refresh).grid(row = 17, column = 3)
+
+    def go_menu(self):
+        self.grid_forget()
+        self.parent.pages[0].grid()
 
     def save_q(self):
         in_choices = list(map(lambda el: el.get(), self.question["incorrect"]))
@@ -60,28 +68,28 @@ class Settings(Frame):
 
 
 
-        self.question["text"] = Text(self, width = 30, height = 2)
+        self.question["text"] = Text(self.subFrame, width = 30, height = 2)
         self.question["text"].grid(row = new_row, column = 2)
 
-        c_entry = Entry(self, textvariable = self.question["correct"])
+        c_entry = Entry(self.subFrame, textvariable = self.question["correct"])
         c_entry.grid(row = new_row, column = 3)
 
         for i in range(3):
-            entry = Entry(self, textvariable = self.question["incorrect"][i])
+            entry = Entry(self.subFrame, textvariable = self.question["incorrect"][i])
             entry.grid(row = new_row, column = 4 + i)
 
-        self.b = Button(self, text = "Save", font = ("MS", 8, "bold"))
+        self.b = Button(self.subFrame, text = "Save", font = ("MS", 8, "bold"))
         self.b.grid(row = new_row, column = 7)
         self.b["command"] = self.send_q_data
     def refresh(self):
-        self.destroy()
-        Settings(self.parent)
+        self.subFrame.destroy()
+        self.list_qs()
 
 
     def send_q_data(self):
         in_choices = list(map( lambda el: el.get(), self.question["incorrect"]))
         q = {"text": self.question["text"].get("1.0", END), "correct": self.question["correct"].get(), "incorrect": in_choices}
-        Multiplechoice().add_question(q)
+        Multiplechoice.add_question(q)
         self.refresh()
 
 

@@ -1,4 +1,4 @@
-import UI.mainUI
+from UI.mainUI import MainUI
 from Quiz.multiplechoice import Multiplechoice
-UI.mainUI.run()
+MainUI().run()
 # Multiplechoice().run()

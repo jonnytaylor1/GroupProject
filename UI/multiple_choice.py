@@ -5,8 +5,7 @@ from Quiz.multiplechoice import Multiplechoice
 class MultipleChoice(Frame):
     def __init__(self, parent):
         self.parent = parent
-        Frame.__init__(self, parent)
-        self.grid()
+        Frame.__init__(self, parent.root)
         self.qIter = Multiplechoice().get_questions()
         self.num = 0
         self.create_questions()
@@ -34,13 +33,18 @@ class MultipleChoice(Frame):
             self.q_text["text"] = q_text
             for button, choice in zip(self.choices, choices):
                 button["text"] = choice
-                button["command"] = lambda x=choice, correct = correct: self.check_answer(x, correct)
+                button["command"] = lambda button=button, correct = correct: self.check_answer(button, correct)
         except StopIteration:
             tkinter.messagebox.showinfo("Well Done!", "the test is complete!")
-            self.parent.parent.destroy()
-    def check_answer(self, choice, correct):
+            self.parent.root.destroy()
+    def check_answer(self, button, correct):
+        if button["text"] == correct:
+            button["bg"] = "green"
+        else:
+            button["bg"] = "red"
         tkinter.messagebox.showinfo("Answer submitted",
-                                    f"{choice} is correct!" if choice == correct else f"Sorry, the correct answer is {correct}")
+                                    f"{button['text']} is correct!" if button["text"] == correct else f"Sorry, the correct answer is {correct}")
+        button["bg"] = "SystemButtonFace"
         self.load_questions()
 
 

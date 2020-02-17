@@ -1,5 +1,5 @@
-from Quiz.multiplechoice import get_question, save_question
+from Quiz.multiplechoice import get_question, save_question, Multiplechoice
 
 print(get_question(2))
-save_question(2, "hello", "how", "b", "c", "d")
+Multiplechoice.add_question({"text": "A", "correct": "A", "incorrect": ["D", "B", "C"]})
 print(get_question(2))

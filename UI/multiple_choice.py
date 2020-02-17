@@ -10,7 +10,7 @@ class MultipleChoice(Frame):
 
     def show(self):
         self.grid()
-        self.qIter = Multiplechoice().get_questions()
+        self.qIter = Multiplechoice().get_questions(True)
         self.stats = {"total_time": 0,
                       "correct_qs": 0,
                       "incorrect_qs": 0,
@@ -37,10 +37,19 @@ class MultipleChoice(Frame):
         self.b_next.grid(row=7, column=6)
         self.b_restart = Button(self, text="Restart", command=self.show)
         self.b_restart.grid(row=7, column=7)
+        self.b_end = Button(self, text="End Quiz", command=self.end_quiz)
+        self.b_end.grid(row=7, column=8)
         for i, answer in enumerate(list("abcd")):
             b = Button(self, text = answer, font=("MS", 8, "bold"))
             b.grid(row = 6 + i, column=5)
             self.choices.append(b)
+
+    def end_quiz(self):
+        self.grid_remove()
+        self.stats["skipped_qs"] += 1
+        self.stats["total_time"] += self.parent.diff
+        self.parent.pages["EndScreen"].show(self.stats)
+
     def load_questions(self):
         try:
             q_text, choices, correct = next(self.qIter)
@@ -48,6 +57,7 @@ class MultipleChoice(Frame):
                 choice["bg"] = "SystemButtonFace"
             self.b_next["command"] = self.skip_q
             self.b_next["text"] = "Skip?"
+            self.b_end.grid()
             self.timer.grid()
             self.parent.clock1 = time.time()
             self.parent.timer.set("00:00")
@@ -73,6 +83,7 @@ class MultipleChoice(Frame):
         self.stats["total_time"] += self.parent.diff
         self.timer.grid_remove()
         self.l_timer.grid_remove()
+        self.b_end.grid_remove()
         self.b_next["text"] = "Next Question"
         self.b_next["command"] = self.load_questions
 

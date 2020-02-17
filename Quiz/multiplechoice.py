@@ -24,7 +24,9 @@ class Multiplechoice():
             with con:
                 con.execute("INSERT INTO questions(question, correct, incorrect1, incorrect2, incorrect3) values (?,?,?,?,?)", (q["text"], q["correct"], b, c, d))
 
-    def get_questions(self):
+    def get_questions(self, random = False):
+        if random:
+            shuffle(self.qbank)
         for question in self.qbank:
             choices = [question["correct"]] + question["incorrect"]
             shuffle(choices)

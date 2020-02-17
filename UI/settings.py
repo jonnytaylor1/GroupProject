@@ -69,7 +69,7 @@ class Settings(Frame):
 
 
 
-        self.question["text"] = Text(self.subFrame, width = 30, height = 1)
+        self.question["text"] = Text(self.subFrame, width = 30, height = 2)
         self.question["text"].grid(row = new_row, column = 2)
 
         c_entry = Entry(self.subFrame, textvariable = self.question["correct"])

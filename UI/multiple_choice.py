@@ -54,7 +54,8 @@ class MultipleChoice(Frame):
         try:
             q_text, choices, correct = next(self.qIter)
             for choice in self.choices:
-                choice["bg"] = "SystemButtonFace"
+                choice["bg"] = "grey"
+                choice["state"] = NORMAL
             self.b_next["command"] = self.skip_q
             self.b_next["text"] = "Skip?"
             self.b_end.grid()
@@ -74,6 +75,8 @@ class MultipleChoice(Frame):
             self.grid_remove()
             self.parent.pages["EndScreen"].show(self.stats)
     def check_answer(self, button, correct):
+        for choice in self.choices:
+            choice["state"] = DISABLED
         if button["text"] == correct:
             button["bg"] = "green"
             self.stats["correct_qs"] += 1
@@ -133,4 +136,3 @@ class EndScreen(Frame):
 
         Button(self, text="Menu", command=self.go_menu).grid(row=7, column=1)
         Button(self, text="Restart", command=self.restart).grid(row=7, column=2)
-

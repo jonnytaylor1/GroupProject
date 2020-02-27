@@ -39,13 +39,15 @@ class Settings(Frame):
             self.rows.append([l_text, l_correct, inc1, inc2, inc3])
         self.b_add = Button(self.subFrame, text = "Add new Question", command= lambda: self.create_q_form(row + 1))
         self.b_add.grid(row = row + 1, column = 3)
-        Button(self.subFrame, text = "Back", command = self.go_menu).grid(row = row + 2, column = 3)
+        Button(self.subFrame, text = "Back - Package Menu", command = self.go_package_menu).grid(row = row + 2, column = 3)
         # left for debugging purposes
         Button(self.subFrame, text = "Refresh", command = self.refresh).grid(row = row + 3, column = 3)
 
-    def go_menu(self):
+
+#J Go back to package menu
+    def go_package_menu(self):
         self.grid_forget()
-        self.parent.pages["Welcome"].grid()
+        self.parent.pages["PackageMenu"].grid()
 
     def save_q(self):
         in_choices = list(map(lambda el: el.get(), self.question["incorrect"]))
@@ -75,8 +77,6 @@ class Settings(Frame):
     def create_q_form(self, new_row):
         self.b_add.destroy()
         self.question = {"correct": StringVar(), "incorrect": [StringVar(), StringVar(), StringVar()]}
-
-
 
         self.question["text"] = Text(self.subFrame, width = 30, height = 2)
         self.question["text"].grid(row = new_row, column = 2)

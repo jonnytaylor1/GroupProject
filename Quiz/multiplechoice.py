@@ -8,15 +8,20 @@ class Multiplechoice():
         self.ensure_table_exists()
         self.load_questions()
 
+#J Had to include package_id when unpacking in load questions so that it still works (and should be useful later as well)
+
     def load_questions(self):
         with Connection() as con:
-            for id, question_text, correct, b, c, d in con.execute("SELECT * from questions"):
+            for id, question_text, correct, b, c, d, package_id in con.execute("SELECT * from questions"):
                 self.qbank.append({"text": question_text, "correct": correct, "incorrect": [b,c,d], "id": id})
 
+
+#J Added foreign key to the original table
+#J Created a new table for packages (for some reason it didnt work when creating the table in the packages file)
     def ensure_table_exists(self):
         with Connection() as con:
-            con.execute(
-                "CREATE TABLE IF NOT EXISTS questions (id INTEGER PRIMARY KEY, question TEXT, correct TEXT, incorrect1 TEXT, incorrect2 TEXT, incorrect3 TEXT)")
+            con.execute("CREATE TABLE IF NOT EXISTS packages (package_id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE, quiz_format text UNIQUE)")
+            con.execute("CREATE TABLE IF NOT EXISTS questions (id INTEGER PRIMARY KEY, question TEXT, correct TEXT, incorrect1 TEXT, incorrect2 TEXT, incorrect3 TEXT, package_id INTEGER, FOREIGN KEY (package_id) REFERENCES packages (package_id))")
 
     def add_question(q):
         b, c, d = q["incorrect"]

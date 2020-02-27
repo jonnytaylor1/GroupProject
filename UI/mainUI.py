@@ -14,6 +14,7 @@ class MainUI():
         self.pages = {"Welcome": Welcome(self),
                       "Settings": Settings(self),
                       "MultipleChoice": MultipleChoice(self),
+                      "PackageMenu": PackageMenu(self),
                       "EndScreen": EndScreen(self)}
         # this is the first page to show
         self.curr_window = self.pages["Welcome"]

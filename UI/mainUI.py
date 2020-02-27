@@ -18,9 +18,10 @@ class MainUI():
 
     def update_clock(self):
         self.clock2 = time.time()
-        self.diff = int(self.clock2 - self.clock1)
-        self.timer.set(f"{self.diff // 600}{(self.diff // 60) % 10}:{(self.diff // 10) % 6}{self.diff % 10}")
-        self.root.after(1000, self.update_clock)
+        self.diff = self.clock2 - self.clock1
+        int_diff = int(self.diff)
+        self.timer.set(f"{int_diff // 600}{(int_diff // 60) % 10}:{(int_diff // 10) % 6}{int_diff % 10}")
+        self.root.after(100, self.update_clock)
 
     def run(self):
         self.curr_window.grid()

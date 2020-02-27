@@ -30,7 +30,7 @@ class Multiplechoice():
         for question in self.qbank:
             choices = [question["correct"]] + question["incorrect"]
             shuffle(choices)
-            yield (question["text"], choices, question["correct"])
+            yield (question["id"], question["text"], choices, question["correct"])
 
     def run(self):
         for (question, choices, correct) in self.get_questions():

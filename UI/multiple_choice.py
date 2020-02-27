@@ -14,13 +14,18 @@ class MultipleChoice(Frame):
         self.stats = {"total_time": 0,
                       "correct_qs": 0,
                       "incorrect_qs": 0,
-                      "skipped_qs": 0}
+                      "skipped_qs": 0,
+                      "qs": []}
         self.num = 0
         self.load_questions()
 
     def skip_q(self):
         self.stats["skipped_qs"] += 1
         self.stats["total_time"] += self.parent.diff
+        self.stats["qs"].append({"status": "skipped",
+                                 "q_id":self.q_id,
+                                 "time": self.parent.diff,
+                                 "answer": None})
         self.load_questions()
 
     def create_questions(self):
@@ -52,7 +57,7 @@ class MultipleChoice(Frame):
 
     def load_questions(self):
         try:
-            q_text, choices, correct = next(self.qIter)
+            self.q_id, q_text, choices, correct = next(self.qIter)
             for choice in self.choices:
                 choice["bg"] = "grey"
                 choice["state"] = NORMAL
@@ -80,9 +85,19 @@ class MultipleChoice(Frame):
         if button["text"] == correct:
             button["bg"] = "green"
             self.stats["correct_qs"] += 1
+            self.stats["qs"].append({"status": "correct",
+                                    "q_id": self.q_id,
+                                    "time": self.parent.diff,
+                                     "answer": button["text"]})
         else:
             button["bg"] = "red"
             self.stats["incorrect_qs"] += 1
+            self.stats["qs"].append({"status": "incorrect",
+                                    "q_id": self.q_id,
+                                    "time": self.parent.diff,
+                                     "answer": button["text"]})
+        for choice in self.choices:
+            choice["state"] = DISABLED
         self.stats["total_time"] += self.parent.diff
         self.timer.grid_remove()
         self.l_timer.grid_remove()
@@ -104,17 +119,36 @@ class EndScreen(Frame):
         self.l_correct_answers["text"] = stats["correct_qs"]
         self.l_skipped_answers["text"] = stats["skipped_qs"]
         self.l_total_answers["text"] = total
-        time = stats["total_time"]
+        time = int(stats["total_time"])
         self.l_total_time["text"] = f"{time // 600}{(time // 60) % 10}:{(time // 10) % 6}{time % 10}"
+        self.subFrame = Frame(self)
+        self.subFrame.grid(column=3, row=2, rowspan=10)
+        for i,q in enumerate(stats["qs"]):
+            id, question, corr, inc1, inc2, inc3 = Multiplechoice.get_question(q["q_id"])
+            text = f"{i + 1}. {question} {q['answer'] if q['answer'] else 'Skipped'}."
+            l = Label(self.subFrame)
+            l.grid(row=1 + i, column=1)
+            if q["status"] == "correct":
+                l["fg"] = "green"
+            elif q["status"] == "incorrect":
+                l["fg"] = "red"
+                text += f" (Correct: {corr})"
+            elif q["status"] == "skipped":
+                l["fg"] = "grey"
+            t = int(q['time'])
+            time = f"{t // 600}{(t // 60) % 10}:{(t // 10) % 6}{t % 10}"
+            text += f" Time spent: {time}"
+            l["text"] = text
 
     def go_menu(self):
+        self.subFrame.destroy()
         self.grid_remove()
         self.parent.pages["Welcome"].grid()
 
     def restart(self):
+        self.subFrame.destroy()
         self.grid_remove()
         self.parent.pages["MultipleChoice"].show()
-
 
     def create_stat_page(self):
         Label(self, text = "Incorrect Answers:").grid(row=2, column=1)
@@ -133,6 +167,9 @@ class EndScreen(Frame):
         self.l_total_answers.grid(row=5, column=2)
         self.l_total_time = Label(self, text = "Total Time Spent")
         self.l_total_time.grid(row=6, column=2)
+
+
+
 
         Button(self, text="Menu", command=self.go_menu).grid(row=7, column=1)
         Button(self, text="Restart", command=self.restart).grid(row=7, column=2)

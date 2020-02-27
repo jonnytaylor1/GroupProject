@@ -1,7 +1,7 @@
 from random import shuffle
 from data.connection import Connection
 
-
+# Creates a backend model of the questions for the multiple choice quiz
 class Multiplechoice():
     def __init__(self):
         self.qbank = []
@@ -40,7 +40,6 @@ class Multiplechoice():
                 print(f"{i + 1}. {choice}")
             ans = input("Select Answer: ")
             print("correct" if correct == ans.upper() else f"{ans} is incorrect. Correct is {correct}")
-
     def get_question(id):
         with Connection() as con:
             with con:

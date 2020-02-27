@@ -10,7 +10,9 @@ class MultipleChoice(Frame):
 
     def show(self):
         self.grid()
+        # get data on questions from the model
         self.qIter = Multiplechoice().get_questions(True)
+        # initialize the stats for the quiz at the start
         self.stats = {"total_time": 0,
                       "correct_qs": 0,
                       "incorrect_qs": 0,
@@ -19,6 +21,7 @@ class MultipleChoice(Frame):
         self.num = 0
         self.load_questions()
 
+    #  update stats when you skip a question
     def skip_q(self):
         self.stats["skipped_qs"] += 1
         self.stats["total_time"] += self.parent.diff
@@ -26,8 +29,10 @@ class MultipleChoice(Frame):
                                  "q_id":self.q_id,
                                  "time": self.parent.diff,
                                  "answer": None})
+        # load next question
         self.load_questions()
 
+    # create question form for the multiple choice
     def create_questions(self):
         self.q_num = Label(self, text = "Question 1: ", font = ("MS", 8, "bold"))
         self.q_num.grid(row = 2, column = 4)
@@ -49,12 +54,15 @@ class MultipleChoice(Frame):
             b.grid(row = 6 + i, column=5)
             self.choices.append(b)
 
+    # record as skipped question when you end quiz prematurely
     def end_quiz(self):
         self.grid_remove()
         self.stats["skipped_qs"] += 1
         self.stats["total_time"] += self.parent.diff
+        # show final statistics for the quiz
         self.parent.pages["EndScreen"].show(self.stats)
 
+    # reset everything and load next question
     def load_questions(self):
         try:
             self.q_id, q_text, choices, correct = next(self.qIter)
@@ -79,8 +87,11 @@ class MultipleChoice(Frame):
             tkinter.messagebox.showinfo("Well Done!", "the test is complete!")
             self.grid_remove()
             self.parent.pages["EndScreen"].show(self.stats)
+    # compare the answer to the correct one
+
     def check_answer(self, button, correct):
         for choice in self.choices:
+            # lock ability to choose another answer
             choice["state"] = DISABLED
         if button["text"] == correct:
             button["bg"] = "green"
@@ -104,14 +115,14 @@ class MultipleChoice(Frame):
         self.b_end.grid_remove()
         self.b_next["text"] = "Next Question"
         self.b_next["command"] = self.load_questions
-
+# Generate the end screen frame
 class EndScreen(Frame):
 
     def __init__(self, parent):
         Frame.__init__(self, parent.root)
         self.parent = parent
         self.create_stat_page()
-
+    # fill statistics for the quiz
     def show(self, stats):
         self.grid()
         total = stats["incorrect_qs"] + stats["correct_qs"] + stats["skipped_qs"]
@@ -123,6 +134,7 @@ class EndScreen(Frame):
         self.l_total_time["text"] = f"{time // 600}{(time // 60) % 10}:{(time // 10) % 6}{time % 10}"
         self.subFrame = Frame(self)
         self.subFrame.grid(column=3, row=2, rowspan=10)
+
         for i,q in enumerate(stats["qs"]):
             id, question, corr, inc1, inc2, inc3 = Multiplechoice.get_question(q["q_id"])
             text = f"{i + 1}. {question} {q['answer'] if q['answer'] else 'Skipped'}."
@@ -144,12 +156,12 @@ class EndScreen(Frame):
         self.subFrame.destroy()
         self.grid_remove()
         self.parent.pages["Welcome"].grid()
-
+    #  restart the quiz
     def restart(self):
         self.subFrame.destroy()
         self.grid_remove()
         self.parent.pages["MultipleChoice"].show()
-
+    # create form for the stats to fill
     def create_stat_page(self):
         Label(self, text = "Incorrect Answers:").grid(row=2, column=1)
         Label(self, text = "Correct Answers:").grid(row=3, column=1)

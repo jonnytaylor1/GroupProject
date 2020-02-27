@@ -1,13 +1,13 @@
 from tkinter import *
 from Quiz.multiplechoice import Multiplechoice
-
+# create Settings UI for the quiz
 class Settings(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent.root)
         self.parent = parent
         self.list_qs()
 
-
+    # list questions imported from the Multiple choice model
     def list_qs(self):
         h_row = 1
         h_font = ("MS", 10, "bold")
@@ -40,6 +40,7 @@ class Settings(Frame):
         self.b_add = Button(self.subFrame, text = "Add new Question", command= lambda: self.create_q_form(row + 1))
         self.b_add.grid(row = row + 1, column = 3)
         Button(self.subFrame, text = "Back", command = self.go_menu).grid(row = row + 2, column = 3)
+        # left for debugging purposes
         Button(self.subFrame, text = "Refresh", command = self.refresh).grid(row = row + 3, column = 3)
 
     def go_menu(self):
@@ -51,6 +52,7 @@ class Settings(Frame):
         Multiplechoice.save_question(self.question["id"], self.question["text"].get("1.0", END).rstrip(), self.question["correct"].get(), *in_choices)
         self.refresh()
 
+    # send edit form to the database
     def edit_q(self, row, id):
         for label in self.rows[row - 2]:
             label.grid_remove()
@@ -63,13 +65,13 @@ class Settings(Frame):
         self.question["incorrect"][2].set(inc3)
         self.b["command"] = lambda: self.save_q()
 
-
+    # delete a question in the database
     def del_q(self, i):
         Multiplechoice.delete_question(i)
         self.refresh()
 
 
-
+    #  create a new form for the next question
     def create_q_form(self, new_row):
         self.b_add.destroy()
         self.question = {"correct": StringVar(), "incorrect": [StringVar(), StringVar(), StringVar()]}
@@ -93,12 +95,9 @@ class Settings(Frame):
         self.subFrame.destroy()
         self.list_qs()
 
-
+    # create a new question in the database
     def send_q_data(self):
         in_choices = list(map( lambda el: el.get(), self.question["incorrect"]))
         q = {"text": self.question["text"].get("1.0", END).rstrip(), "correct": self.question["correct"].get(), "incorrect": in_choices}
         Multiplechoice.add_question(q)
         self.refresh()
-
-
-

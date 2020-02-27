@@ -1,4 +1,5 @@
 from tkinter import *
+# This is a start page for the program
 class Welcome(Frame):
     def __init__(self, parent):
         self.parent = parent
@@ -15,10 +16,12 @@ class Welcome(Frame):
         b2.grid(row = 4, column = 3, columnspan = 5)
         b2["command"] = self.go_to_settings
 
+    # goes to  the Multiple choice page
     def start_quiz(self):
         self.grid_forget()
         self.parent.pages["MultipleChoice"].show()
 
+    # goes to the settings page
     def go_to_settings(self):
         self.grid_forget()
         self.parent.pages["Settings"].grid()

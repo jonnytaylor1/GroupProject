@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter.ttk import Treeview, Notebook, Separator
+from tkinter.ttk import Treeview, Notebook, Separator, Style
 from collections import namedtuple
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -19,7 +19,7 @@ class StatsTable(Treeview):
         self.create_table()
 
         # no db yet so invent some data
-        if quiz==1:
+        if quiz == 1:
             self.dummy_data = [QuestionStats(1, 20, 70, 30),
                                QuestionStats(2, 50, 50, 9),
                                QuestionStats(4, 40, 30, 5),
@@ -79,22 +79,25 @@ class StatsTable(Treeview):
 
 class QuizView(Frame):
     """This class provides the view for an individual quiz inside each tab"""
+
     def __init__(self, parent, quiz, *args, **kwargs):
         Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
         stats_table_row_number = 7
 
         self.table_scrollbar = Scrollbar(self)
-        self.stats_table = StatsTable(self, quiz, height=stats_table_row_number, yscrollcommand=self.table_scrollbar.set)
+        self.stats_table = StatsTable(self, quiz,
+                                      height=stats_table_row_number, yscrollcommand=self.table_scrollbar.set)
         self.table_scrollbar.config(command=self.stats_table.yview)
 
         self.data = self.stats_table.dummy_data
 
-        self.stats_table.grid(row=2, column=1, columnspan=2)
-        self.table_scrollbar.grid(row=2, column=3, sticky="ns")
+        # FIXME: padding
+        self.stats_table.grid(row=2, column=1, columnspan=2, padx=(50, 0), pady=(10, 5))
+        self.table_scrollbar.grid(row=2, column=3, sticky="ns", padx=(0, 50), pady=(10, 5))
 
-        self.separator = Separator(self)
-        self.separator.grid(row=3, column=1, columnspan=3, sticky="we")
+        # self.separator = Separator(self)
+        # self.separator.grid(row=3, column=1, columnspan=3, sticky="we")
 
         self.extra_text = Label(self, text="We can say something here \n about best/worst\n questions")
         self.extra_text.grid(row=4, column=1)
@@ -111,9 +114,7 @@ class QuizView(Frame):
         self.canvas.draw()
         # Canvases can be added to the grid
         # FIXME: padding
-        self.canvas.get_tk_widget().grid(row=4, column=2, pady=10)
-
-
+        self.canvas.get_tk_widget().grid(row=4, column=2, pady=(5, 10))
 
 
 class Statistics(Frame):
@@ -126,9 +127,13 @@ class Statistics(Frame):
         self.hello_world = Label(self, text="Hello World! \n This is where the statistics will be")
         self.hello_world.grid(row=1, column=1, columnspan=2)
 
-        self.tabbed_section = Notebook(self)
+        # hide border
+        # https://groups.google.com/forum/#!topic/comp.lang.tcl/8a6e4tfWJvo
+        s = Style(self)
+        s.configure('flat.TNotebook', borderwidth=0)
+        self.tabbed_section = Notebook(self, style="flat.TNotebook")
         # create frames for tabs
-        self.quiz_one = QuizView(self.tabbed_section, 1)
+        self.quiz_one = QuizView(self.tabbed_section, 1, borderwidth=0, highlightthickness=0)
         self.quiz_two = QuizView(self.tabbed_section, 2)
         # attach tabs
         self.tabbed_section.add(self.quiz_one, text="Quiz 1")

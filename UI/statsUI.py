@@ -5,7 +5,9 @@ from collections import namedtuple
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
-QuestionStatistic = namedtuple("QuestionStatistic", ["q_number", "time", "pc_correct", "pc_abandon"])
+from typing import List
+
+QuestionStats = namedtuple("QuestionStatistic", ["q_number", "time", "pc_correct", "pc_abandon"])
 
 
 class StatsTable(Treeview):
@@ -17,12 +19,12 @@ class StatsTable(Treeview):
         self.create_table()
 
         # no db yet so invent some data
-        self.dummy_data = [QuestionStatistic("1", "20", "70", "30"),
-                           QuestionStatistic("2", "50", "50", "9"),
-                           QuestionStatistic("4", "40", "30", "5"),
-                           QuestionStatistic("5", "10", "60", "10"),
-                           QuestionStatistic("6", "90", "10", "90"),
-                           QuestionStatistic("10", "15", "40", "4")]
+        self.dummy_data = [QuestionStats("1", "20", "70", "30"),
+                           QuestionStats("2", "50", "50", "9"),
+                           QuestionStats("4", "40", "30", "5"),
+                           QuestionStats("5", "10", "60", "10"),
+                           QuestionStats("6", "90", "10", "90"),
+                           QuestionStats("10", "15", "40", "4")]
 
         self.insert_data(self.dummy_data)
 
@@ -45,8 +47,8 @@ class StatsTable(Treeview):
         # hide the first column which has no heading and is pretty useless
         self["show"] = "headings"
 
-    def insert_data(self, data: QuestionStatistic):
-        # FIXME: Dummy data
+    def insert_data(self, data: List[QuestionStats]):
+        # FIXME: Dummy datL
 
         for item in data:
             self.insert("", 0, text=item.q_number,
@@ -87,6 +89,6 @@ class Statistics(Frame):
         fig = Figure(figsize=(5, 2), dpi=100)
         bar_chart = fig.add_subplot(111)
         bar_chart.bar([i.q_number for i in stats_table.dummy_data], [i.time for i in stats_table.dummy_data])
-        canvas = FigureCanvasTkAgg(fig, master=self) 
+        canvas = FigureCanvasTkAgg(fig, master=self)
         canvas.draw()
         canvas.get_tk_widget().grid(row=3, column=2)

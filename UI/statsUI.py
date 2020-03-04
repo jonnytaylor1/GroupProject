@@ -92,3 +92,6 @@ class Statistics(Frame):
         canvas = FigureCanvasTkAgg(fig, master=self)
         canvas.draw()
         canvas.get_tk_widget().grid(row=3, column=2)
+
+        button = Button(self, text="This button does nothing")
+        button.grid(row=4, column=1, columnspan=2)

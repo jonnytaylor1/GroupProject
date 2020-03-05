@@ -6,7 +6,7 @@ class Hangman():
     def __init__(self):
         pass
 
-    def get_question(self):
+    def get_question():
         m = Multiplechoice()
         shuffle(m.qbank)
         return m.qbank[0]

@@ -1,3 +1,3 @@
 from Quiz.hangman import Hangman
 
-print(Hangman().get_question())
+print(Hangman.get_question())

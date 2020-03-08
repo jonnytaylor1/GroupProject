@@ -36,7 +36,20 @@ class Statistics():
                 SELECT *
                 FROM statistics
                 WHERE question_id = ?
-                ''', str(id)).fetchone()
+                ''', (str(id),)).fetchone()
+
+    def increment_stats(obj):
+        new_obj = {}
+        id, new_obj["id"], new_obj["corrects"], new_obj["incorrects"], new_obj["skips"], new_obj["time"] = Statistics.get_stats(obj["id"])
+        for attr in ["corrects", "incorrects", "skips", "time"]:
+            try:
+                new_obj[attr] += obj[attr]
+            except KeyError:
+                pass
+        print(new_obj)
+
+        Statistics.update_stats(new_obj)
+
 
     def update_stats(obj):
         obj = {k: str(v) for k, v in obj.items()}

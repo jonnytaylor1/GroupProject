@@ -2,6 +2,7 @@ from tkinter import *
 import time
 import tkinter.messagebox
 from Quiz.multiplechoice import Multiplechoice
+from Quiz.statistics import Statistics
 class MultipleChoice(Frame):
     def __init__(self, parent):
         self.parent = parent
@@ -29,6 +30,7 @@ class MultipleChoice(Frame):
                                  "q_id":self.q_id,
                                  "time": self.parent.diff,
                                  "answer": None})
+        Statistics.increment_stats({"id": self.q_id, "time": int(self.parent.diff), "skips": 1})
         # load next question
         self.load_questions()
 
@@ -59,6 +61,7 @@ class MultipleChoice(Frame):
         self.grid_remove()
         self.stats["skipped_qs"] += 1
         self.stats["total_time"] += self.parent.diff
+        Statistics.increment_stats({"id": self.q_id, "time": int(self.parent.diff), "skips": 1})
         # show final statistics for the quiz
         self.parent.pages["EndScreen"].show(self.stats)
 
@@ -100,6 +103,8 @@ class MultipleChoice(Frame):
                                     "q_id": self.q_id,
                                     "time": self.parent.diff,
                                      "answer": button["text"]})
+            Statistics.increment_stats({"id": self.q_id, "time": int(self.parent.diff), "corrects": 1})
+
         else:
             button["bg"] = "red"
             self.stats["incorrect_qs"] += 1
@@ -107,6 +112,7 @@ class MultipleChoice(Frame):
                                     "q_id": self.q_id,
                                     "time": self.parent.diff,
                                      "answer": button["text"]})
+            Statistics.increment_stats({"id": self.q_id, "time": int(self.parent.diff), "incorrects": 1})
         for choice in self.choices:
             choice["state"] = DISABLED
         self.stats["total_time"] += self.parent.diff

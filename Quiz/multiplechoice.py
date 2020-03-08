@@ -28,7 +28,7 @@ class Multiplechoice():
             with con:
                 y = con.execute("INSERT INTO questions(question, correct, incorrect1, incorrect2, incorrect3) values (?,?,?,?,?)", (q["text"], q["correct"], b, c, d))
                 id = y.lastrowid
-        Statistics.create_stats(y.lastrowid)
+        Statistics.create_stats(id)
 
     def get_questions(self, random = False):
         if random:

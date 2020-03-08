@@ -9,6 +9,7 @@ from typing import List
 
 
 QuestionStats = namedtuple("QuestionStatistic", ["q_number", "time", "pc_correct", "pc_abandon"])
+StatsCol = namedtuple("StatsCol", ["name", "heading"])
 
 
 class StatsTable(Treeview):
@@ -17,10 +18,10 @@ class StatsTable(Treeview):
     def __init__(self, parent, quiz, **kwargs):
         super().__init__(parent, **kwargs)
 
-        self.columns = [("number", "Question Number"),
-                        ("time", "Mean Time"),
-                        ("correct", "Accuracy"),
-                        ("abandoned", "Abandoned")]
+        self.table_columns = [StatsCol("number", "Question Number"),
+                              StatsCol("time", "Mean Time"),
+                              StatsCol("correct", "Accuracy"),
+                              StatsCol("abandoned", "Abandoned")]
         self.create_table()
 
         # no db yet so invent some data
@@ -42,7 +43,7 @@ class StatsTable(Treeview):
         self.insert_data(self.dummy_data)
 
         # initial sort by question number after creation, just in case
-        self.sort_column("number", "Question Number", False)
+        self.sort_column(self.table_columns[0], False)
 
     def create_table(self):
         """Creates the table and sets up the headings. Should only run once"""
@@ -50,19 +51,13 @@ class StatsTable(Treeview):
         # make individual items in the table unselectable - unless we can think of a use for selection?
         self.configure(selectmode="none")
 
-        self["columns"] = [col[0] for col in self.columns]
+        self["columns"] = [col.name for col in self.table_columns]
 
-        self.set_headings()
-
+        for col in self.table_columns:
+            self.heading(col.name, text=col.heading,
+                         command=lambda col=col: self.sort_column(col, False))
         # hide the first column which has no heading and is pretty useless
         self["show"] = "headings"
-
-    def set_headings(self):
-        # I tried to iterate over a list instead of hard coding but it bugged out my sorts badly :(
-        self.heading("number", text="Question Number", command=lambda: self.sort_column("number", "Question Number", False))
-        self.heading("time", text="Mean time", command=lambda: self.sort_column("time", "Mean time", False))
-        self.heading("correct", text="Accuracy", command=lambda: self.sort_column("correct", "Accuracy", False))
-        self.heading("abandoned", text="Abandoned", command=lambda: self.sort_column("abandoned", "Abandoned", False))
 
     def insert_data(self, data: List[QuestionStats]):
         # FIXME: Dummy datL
@@ -73,23 +68,26 @@ class StatsTable(Treeview):
                                 f"{item.time}s", f"{item.pc_correct}%", f"{item.pc_abandon}%"])
 
     # https://stackoverflow.com/questions/46618459/tkinter-treeview-column-sorting
-    def sort_column(self, col, heading, reverse):
-        l = [(self.set(k, col), k) for k in self.get_children('')]
+    def sort_column(self, sort_col, reverse):
+        l = [(self.set(k, sort_col.name), k) for k in self.get_children('')]
         l.sort(key=lambda x: float(x[0].strip('%Question')), reverse=reverse)
 
         # rearrange items in sorted positions
         for index, (val, k) in enumerate(l):
             self.move(k, '', index)
 
-        self.set_headings()
-
         sort_indicator = "↓"
         if reverse:
             sort_indicator = "↑"
 
         # reverse sort next time
-        self.heading(col, text=f"{heading}{sort_indicator}", command=lambda: self.sort_column(col, heading, not reverse))
-
+        for col in self.table_columns:
+            if col.name == sort_col.name:
+                self.heading(col.name, text=f"{col.heading}{sort_indicator}",
+                             command=lambda col=col: self.sort_column(col, not reverse))
+            else:
+                self.heading(col.name, text=col.heading,
+                             command=lambda col=col: self.sort_column(col, False))
 
 class QuizView(Frame):
     """This class provides the view for an individual quiz inside each tab"""

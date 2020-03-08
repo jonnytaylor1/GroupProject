@@ -1,11 +1,13 @@
 from data.connection import Connection
+from collections import namedtuple
 
 class Statistics():
     def __init__(self):
         self.ensure_table_exists()
+        self.q_bank = []
 
     # auto-creates the table if it does not exist
-    def ensure_table_exists():
+    def ensure_table_exists(self):
         with Connection() as con:
             con.execute('''
             CREATE TABLE IF NOT EXISTS statistics(
@@ -70,3 +72,27 @@ class Statistics():
                       obj["skips"],
                       obj["time"],
                       obj["id"]))
+
+    def load_stats(self):
+        counter = 0
+        Question = namedtuple("Question",
+                              ["q_number", "text", "correct", "in1", "in2", "in3", "pc_correct", "pc_abandon", "time"])
+        with Connection() as con:
+            with con:
+                for id, q_text, correct, in1, in2, in3, stat_id, q_id, corrects, incorrects, skips, time in con.execute('''
+                SELECT * 
+                FROM questions
+                INNER JOIN statistics
+                ON questions.id = statistics.question_id
+                '''):
+                    counter += 1
+                    answered = corrects + incorrects
+                    accuracy = round(corrects * 100 / answered)
+                    abandons = round(skips * 100 / (answered + skips))
+                    mean_time = round(time / (10 *answered))
+
+                    self.q_bank.append(Question(counter, q_text, correct, in1, in2, in3, accuracy, abandons, mean_time))
+
+    def get_overall_stats(self):
+        self.load_stats()
+        return self.q_bank

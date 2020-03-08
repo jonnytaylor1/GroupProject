@@ -8,7 +8,7 @@ class Multiplechoice():
         self.qbank = []
         self.ensure_table_exists()
         self.load_questions()
-        Statistics.ensure_table_exists()
+        Statistics()
 
 
     def load_questions(self):

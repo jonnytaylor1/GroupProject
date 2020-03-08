@@ -7,6 +7,7 @@ from matplotlib.figure import Figure
 
 from typing import List
 
+
 QuestionStats = namedtuple("QuestionStatistic", ["q_number", "time", "pc_correct", "pc_abandon"])
 
 

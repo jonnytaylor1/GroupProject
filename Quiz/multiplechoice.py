@@ -50,6 +50,9 @@ class Multiplechoice():
         with Connection() as con:
             with con:
                 return con.execute("SELECT id, question, correct, incorrect1, incorrect2, incorrect3 from questions WHERE id = ?", str(id)).fetchone()
+
+
+
     def save_question(id, question, correct, inc1, inc2, inc3):
         with Connection() as con:
             with con:

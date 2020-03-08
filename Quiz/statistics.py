@@ -1,11 +1,10 @@
 from data.connection import Connection
 
-# def save_stats()
-
 class Statistics():
     def __init__(self):
         self.ensure_table_exists()
 
+    # auto-creates the table if it does not exist
     def ensure_table_exists():
         with Connection() as con:
             con.execute('''
@@ -19,6 +18,7 @@ class Statistics():
             FOREIGN KEY(question_id) REFERENCES questions(id)
             )''')
 
+    # creates a new stats entry for a new question and sets all values to 0
     def create_stats(id):
         with Connection() as con:
             with con:
@@ -29,6 +29,8 @@ class Statistics():
                 (?, 0, 0, 0, 0)
                 ''', (id, ))
 
+    # returns stats for a question id
+    # time is represented by 10^(-1) seconds
     def get_stats(id):
         with Connection() as con:
             with con:
@@ -38,6 +40,7 @@ class Statistics():
                 WHERE question_id = ?
                 ''', (str(id),)).fetchone()
 
+    # increments existing stats by this amount
     def increment_stats(obj):
         new_obj = {}
         id, new_obj["id"], new_obj["corrects"], new_obj["incorrects"], new_obj["skips"], new_obj["time"] = Statistics.get_stats(obj["id"])
@@ -50,7 +53,7 @@ class Statistics():
 
         Statistics.update_stats(new_obj)
 
-
+    # replaces old values with new values
     def update_stats(obj):
         obj = {k: str(v) for k, v in obj.items()}
         with Connection() as con:

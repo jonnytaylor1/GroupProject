@@ -87,9 +87,9 @@ class Statistics():
                 '''):
                     counter += 1
                     answered = corrects + incorrects
-                    accuracy = round(corrects * 100 / answered)
-                    abandons = round(skips * 100 / (answered + skips))
-                    mean_time = round(time / (10 *answered))
+                    abandons = "N/A" if answered + skips <= 0 else round(skips * 100 / (answered + skips))
+                    accuracy = "N/A" if answered <= 0 else round(corrects * 100 / answered)
+                    mean_time = "N/A" if answered <= 0 else round(time / (10 * answered))
 
                     self.q_bank.append(Question(counter, q_text, correct, in1, in2, in3, accuracy, abandons, mean_time))
 

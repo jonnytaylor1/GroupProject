@@ -15,7 +15,9 @@ class MainUI():
                       "Settings": Settings(self),
                       "MultipleChoice": MultipleChoice(self),
                       "PackageMenu": PackageMenu(self),
-                      "EndScreen": EndScreen(self)}
+                      "EndScreen": EndScreen(self),
+                      "Statistics": Statistics(self)}
+
         # this is the first page to show
         self.curr_window = self.pages["Welcome"]
         self.update_clock()

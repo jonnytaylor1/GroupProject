@@ -1,5 +1,6 @@
 from random import shuffle
 from data.connection import Connection
+from Quiz.statistics import Statistics
 
 # Creates a backend model of the questions for the multiple choice quiz
 class Multiplechoice():
@@ -7,6 +8,8 @@ class Multiplechoice():
         self.qbank = []
         self.ensure_table_exists()
         self.load_questions()
+        Statistics()
+
 
 #J Had to include package_id when unpacking in load questions so that it still works (and should be useful later as well)
 
@@ -25,9 +28,12 @@ class Multiplechoice():
 
     def add_question(q):
         b, c, d = q["incorrect"]
+        id = 0
         with Connection() as con:
             with con:
-                con.execute("INSERT INTO questions(question, correct, incorrect1, incorrect2, incorrect3) values (?,?,?,?,?)", (q["text"], q["correct"], b, c, d))
+                y = con.execute("INSERT INTO questions(question, correct, incorrect1, incorrect2, incorrect3) values (?,?,?,?,?)", (q["text"], q["correct"], b, c, d))
+                id = y.lastrowid
+        Statistics.create_stats(id)
 
     def get_questions(self, random = False):
         if random:
@@ -49,6 +55,9 @@ class Multiplechoice():
         with Connection() as con:
             with con:
                 return con.execute("SELECT id, question, correct, incorrect1, incorrect2, incorrect3 from questions WHERE id = ?", str(id)).fetchone()
+
+
+
     def save_question(id, question, correct, inc1, inc2, inc3):
         with Connection() as con:
             with con:

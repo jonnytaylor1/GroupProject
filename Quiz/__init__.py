@@ -2,3 +2,4 @@
 
 from Quiz.multiplechoice import Multiplechoice
 from Quiz.hangman import Hangman
+from Quiz.statistics import Statistics

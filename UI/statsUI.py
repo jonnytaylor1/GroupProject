@@ -7,6 +7,11 @@ from matplotlib.figure import Figure
 
 from typing import List
 
+#this function returns a list of named tuples that have question info and statistics
+from Quiz.statistics import Statistics as StatDB
+stats = StatDB().get_overall_stats()
+
+
 QuestionStats = namedtuple("QuestionStatistic", ["q_number", "time", "pc_correct", "pc_abandon"])
 StatsCol = namedtuple("StatsCol", ["name", "heading"])
 

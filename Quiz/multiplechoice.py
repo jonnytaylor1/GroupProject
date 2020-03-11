@@ -4,7 +4,7 @@ from Quiz.statistics import Statistics
 
 # Creates a backend model of the questions for the multiple choice quiz
 class Multiplechoice():
-    def __init__(self, package_id):
+    def __init__(self, package_id = None):
         self.qbank = []
         self.ensure_table_exists()
         self.load_questions(package_id)

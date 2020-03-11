@@ -5,4 +5,4 @@ data = [
 ]
 
 for text, correct, in1, in2, in3 in data:
-    Multiplechoice.add_question({"correct": correct, "text": text, "incorrect": [in1, in2, in3]})
+    Multiplechoice.add_question2({"correct": correct, "text": text, "incorrect": [in1, in2, in3]})

@@ -5,14 +5,16 @@ class Settings(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent.root)
         self.parent = parent
-        self.list_qs()
-
-    # list questions imported from the Multiple choice model
-    def list_qs(self):
-        h_row = 1
-        h_font = ("MS", 10, "bold")
         self.subFrame = Frame(self)
         self.subFrame.grid()
+
+    # list questions imported from the Multiple choice model
+    def list_qs(self, package_id):
+        self.package_id = package_id
+        self.subFrame = Frame(self)
+        self.subFrame.grid()
+        h_row = 1
+        h_font = ("MS", 10, "bold")
         Label(self.subFrame, text="Question Prompt", font = h_font).grid(row=h_row, column=2)
         Label(self.subFrame, text="Answer", font = h_font).grid(row=h_row, column=3)
         Label(self.subFrame, text="Incorrect choice 1", font = h_font).grid(row=h_row, column=4)
@@ -20,7 +22,7 @@ class Settings(Frame):
         Label(self.subFrame, text="Incorrect choice 3", font = h_font).grid(row=h_row, column=6)
         row = 1
         self.rows = []
-        for i, q in enumerate(Multiplechoice().qbank):
+        for i, q in enumerate(Multiplechoice(package_id).qbank):
             row += 1
             l_text = Label(self.subFrame, text = q["text"])
             l_text.grid(row=row, column=2)
@@ -93,11 +95,15 @@ class Settings(Frame):
         self.b["command"] = self.send_q_data
     def refresh(self):
         self.subFrame.destroy()
-        self.list_qs()
+        self.list_qs(self.package_id)
 
     # create a new question in the database
     def send_q_data(self):
         in_choices = list(map( lambda el: el.get(), self.question["incorrect"]))
-        q = {"text": self.question["text"].get("1.0", END).rstrip(), "correct": self.question["correct"].get(), "incorrect": in_choices}
+        q = {"text": self.question["text"].get("1.0", END).rstrip(), "correct": self.question["correct"].get(), "incorrect": in_choices, "package_id": self.package_id}
         Multiplechoice.add_question(q)
         self.refresh()
+    def show(self, package_id):
+        self.subFrame.destroy()
+        self.list_qs(package_id)
+        self.grid()

@@ -76,22 +76,29 @@ class Statistics():
     def load_stats(self):
         counter = 0
         Question = namedtuple("Question",
-                              ["q_number", "text", "correct", "in1", "in2", "in3", "pc_correct", "pc_abandon", "time"])
+                              ["q_number", "text", "correct", "in1", "in2", "in3", "corrects", "incorrects", "skips", "total_time", "quiz"])
         with Connection() as con:
             with con:
-                for id, q_text, correct, in1, in2, in3, stat_id, q_id, corrects, incorrects, skips, time in con.execute('''
-                SELECT * 
-                FROM questions
+                for i, row in enumerate(con.execute('''
+                SELECT questions.id,
+                question,
+                correct,
+                incorrect1,
+                incorrect2,
+                incorrect3,
+                corrects,
+                incorrects,
+                skips,
+                time,
+                quiz_format
+                FROM ((questions
                 INNER JOIN statistics
-                ON questions.id = statistics.question_id
-                '''):
-                    counter += 1
-                    answered = corrects + incorrects
-                    abandons = "N/A" if answered + skips <= 0 else round(skips * 100 / (answered + skips))
-                    accuracy = "N/A" if answered <= 0 else round(corrects * 100 / answered)
-                    mean_time = "N/A" if answered <= 0 else round(time / (10 * answered))
-
-                    self.q_bank.append(Question(counter, q_text, correct, in1, in2, in3, accuracy, abandons, mean_time))
+                ON questions.id = statistics.question_id)
+                INNER JOIN packages
+                ON questions.package_id = packages.package_id)
+                ''')):
+                    print(*row)
+                    self.q_bank.append(Question(*row))
 
     def get_overall_stats(self):
         self.load_stats()

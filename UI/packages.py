@@ -23,34 +23,33 @@ class PackageMenu(Frame):
         self.rows = []
         for i, p in enumerate(Package().package_bank):
             row += 1
-            l_name = Label(self.subFrame, text = p["name"])
+            l_name = Label(self.subFrame, text=p["name"])
             l_name.grid(row=row, column=2)
-            b_edit = Button(self.subFrame, text = "Edit Package Name")
-            b_edit.grid(row = row, column = 7)
+            b_edit = Button(self.subFrame, text="Edit Package Name")
+            b_edit.grid(row=row, column=7)
             b_edit["command"] = lambda row=row, package_id = p["package_id"]: self.edit_p(row, package_id)
-            b_edit_questions = Button(self.subFrame, text = "Edit Package Questions")
-            b_edit_questions.grid(row = row, column = 8)
+            b_edit_questions = Button(self.subFrame, text="Edit Package Questions")
+            b_edit_questions.grid(row=row, column=8)
             b_edit_questions["command"] = lambda package_id = p["package_id"]: self.go_to_package_questions(package_id)
 
             # Dropdown menu for quiz format
-            self.format_selected = StringVar(self.subFrame)
+            format_selected = StringVar()
             choices = ['None', 'Quiz 1','Quiz 2']
             # Unpacks package info
-            package_id, name, quiz_format = Package.search_format(p["package_id"])
-            if quiz_format == "Quiz 1" or "Quiz 2":
-                self.format_selected.set(quiz_format)
+            if p["quiz_format"] == "Quiz 1" or "Quiz 2":
+                format_selected.set(p["quiz_format"])
             else:
-                self.format_selected.set("None")
+                format_selected.set("None")
             # When the dropdown menu is selected the command method is triggered
-            format_dropdown = OptionMenu(self.subFrame, self.format_selected, *choices, command=lambda value=self.format_selected.get(), package_id = p["package_id"]: self.assign_format(package_id, value))
-            format_dropdown.grid(row = row, column =4)
-            Button(self.subFrame, text="Delete", command=lambda package_id = p["package_id"]: self.del_p(package_id)).grid(row=row, column=10)
+            format_dropdown = OptionMenu(self.subFrame, format_selected, *choices, command=lambda value=format_selected.get(), package_id = p["package_id"]: self.assign_format(package_id, value))
+            format_dropdown.grid(row=row, column=4)
+            Button(self.subFrame, text="Delete", command=lambda package_id=p["package_id"]: self.del_p(package_id)).grid(row=row, column=10)
             self.rows.append([l_name])
-        self.add_new_package_b = Button(self.subFrame, text = "Add new Package", command= lambda: self.create_p_form(row + 1))
+        self.add_new_package_b = Button(self.subFrame, text="Add new Package", command=lambda: self.create_p_form(row + 1))
         self.add_new_package_b.grid(row = row + 1, column = 3)
-        Button(self.subFrame, text = "Back - Main Menu", command = self.go_menu).grid(row = row + 2, column = 3)
+        Button(self.subFrame, text="Back - Main Menu", command = self.go_menu).grid(row=row + 2, column=3)
         # left for debugging purposes
-        Button(self.subFrame, text = "Refresh", command = self.refresh).grid(row = row + 3, column = 3)
+        Button(self.subFrame, text="Refresh", command=self.refresh).grid(row=row + 3, column=3)
 
 # Updates the table with the format selected for the package (error handling: quiz format is unique and so only one package
 # can be "Quiz 1" and one package can be "Quiz 2", all other packages quiz format are set to null in the table
@@ -116,11 +115,12 @@ class PackageMenu(Frame):
 
 # Updates the package records (error handling: ensures that the package name is unique and is not empty)
     def save_p(self, package_id):
+        package_id, name, quiz_format = Package.get_package(package_id)
         if self.package_name.get() == "":
             messagebox.showinfo("Alert", "Blank package name has not been saved. You must enter a package name before saving")
         else:
             try:
-                Package.save_package(package_id, self.package_name.get().rstrip(), self.format_selected.get())
+                Package.save_package(package_id, self.package_name.get().rstrip(), quiz_format)
                 self.refresh()
 
             except sqlite3.IntegrityError:
@@ -130,5 +130,5 @@ class PackageMenu(Frame):
 # Will eventually go to the packages questions
     def go_to_package_questions(self, package_id):
         self.grid_forget()
-        self.parent.pages["Settings"].grid()
+        self.parent.pages["Settings"].show(package_id)
 

@@ -13,10 +13,10 @@ class Welcome(Frame):
         b1.grid(row = 3, column = 3, columnspan = 5)
         b1["command"] = self.start_quiz
 #J Goes to packages menu
-        b2 = Button(self, text = "Packages Menu", font = ("MS", 8, "bold"))
-        b2.grid(row = 4, column = 3, columnspan = 5)
+        b2 = Button(self, text="Packages Menu", font=("MS", 8, "bold"))
+        b2.grid(row = 4, column = 3, columnspan=5)
         b2["command"] = self.go_to_packages
-        b3 = Button(self, text = "Statistics", font = ("MS", 8, "bold"))
+        b3 = Button(self, text="Statistics", font=("MS", 8, "bold"))
         b3.grid(row=5, column=3, columnspan=5)
         b3["command"] = self.go_to_statistics
 

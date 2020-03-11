@@ -5,6 +5,14 @@ class Package():
     def __init__(self):
         self.package_bank = []
         self.load_packages()
+        self.ensure_table_exists()
+
+
+    def ensure_table_exists(self):
+        with Connection() as con:
+            with con:
+                con.execute(
+                    "CREATE TABLE IF NOT EXISTS packages (package_id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE, quiz_format text UNIQUE)")
 
 
 
@@ -23,6 +31,9 @@ class Package():
     def delete_package(package_id):
         with Connection() as con:
             with con:
+                con.execute('''DELETE 
+                FROM questions
+                WHERE questions.package_id = ?''', (str(package_id),))
                 con.execute("DELETE from packages WHERE package_id = ?", (str(package_id),))
 
     def get_package(package_id):

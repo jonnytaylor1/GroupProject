@@ -51,14 +51,6 @@ class Multiplechoice():
                 id = y.lastrowid
         Statistics.create_stats(id)
 
-    def add_question2(q):
-        b, c, d = q["incorrect"]
-        id = 0
-        with Connection() as con:
-            with con:
-                y = con.execute("INSERT INTO questions(question, correct, incorrect1, incorrect2, incorrect3, package_id) values (?,?,?,?,?,1)", (q["text"], q["correct"], b, c, d))
-                id = y.lastrowid
-        Statistics.create_stats(id)
 
     def get_questions(self, random = False):
         if random:
@@ -91,5 +83,32 @@ class Multiplechoice():
         with Connection() as con:
             with con:
                 con.execute("DELETE from questions WHERE id = ?", (str(id),))
+
+    def get_multiplechoice_qs(random = False):
+        bank = []
+        with Connection() as con:
+            with con:
+                for row in con.execute('''
+                            SELECT
+                            id,
+                            question,
+                            correct,
+                            incorrect1,
+                            incorrect2,
+                            incorrect3
+                            FROM questions
+                            INNER JOIN packages
+                            ON questions.package_id = packages.package_id
+                            WHERE packages.quiz_format = 'Quiz 1'
+                '''):
+                    print(row[0])
+                    bank.append(
+                        {"id": row[0], "text": row[1], "correct": row[2], "incorrect": [row[3], row[4], row[5]]})
+        if random:
+            shuffle(bank)
+        for question in bank:
+            choices = [question["correct"]] + question["incorrect"]
+            shuffle(choices)
+            yield (question["id"], question["text"], choices, question["correct"])
 
 

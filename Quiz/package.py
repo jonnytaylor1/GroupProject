@@ -3,9 +3,10 @@ from data.connection import Connection
 
 class Package():
     def __init__(self):
+        self.ensure_table_exists()
         self.package_bank = []
         self.load_packages()
-        self.ensure_table_exists()
+
 
 
     def ensure_table_exists(self):
@@ -22,10 +23,10 @@ class Package():
                 self.package_bank.append({"name": name, "package_id": package_id, "quiz_format": quiz_format})
 
 
-    def add_package(p):
+    def add_package(name):
         with Connection() as con:
             with con:
-                con.execute("INSERT INTO packages(name) values (?)", (p["name"],))
+                return con.execute("INSERT INTO packages(name) values (?)", (name,)).lastrowid
 
 
     def delete_package(package_id):

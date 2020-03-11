@@ -82,8 +82,7 @@ class PackageMenu(Frame):
             messagebox.showinfo("Alert", "Blank package name has not been saved. You must enter a package name before saving")
         else:
             try:
-                p = {"name": self.package_name.get().rstrip()}
-                Package.add_package(p)
+                Package.add_package(self.package_name.get().rstrip())
                 self.refresh()
             except sqlite3.IntegrityError:
                 messagebox.showinfo("Alert", "There is already a package with this name, please choose a different name")

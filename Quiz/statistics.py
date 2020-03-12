@@ -13,10 +13,12 @@ class Statistics():
             CREATE TABLE IF NOT EXISTS statistics(
             id INTEGER PRIMARY KEY,
             question_id INTEGER,
+            quiz_format INTEGER,
             corrects INTEGER,
             incorrects INTEGER,
             skips INTEGER,
             time INTEGER,
+            abandons INTEGER,
             FOREIGN KEY(question_id) REFERENCES questions(id)
             )''')
 
@@ -24,29 +26,37 @@ class Statistics():
     def create_stats(id):
         with Connection() as con:
             with con:
-                con.execute('''
-                INSERT INTO statistics
-                (question_id, corrects, incorrects, skips, time)
-                VALUES
-                (?, 0, 0, 0, 0)
-                ''', (id, ))
+                for format in range(1,3):
+                    con.execute('''
+                    INSERT INTO statistics
+                    (question_id, quiz_format, corrects, incorrects, skips, abandons, time)
+                    VALUES
+                    (?, ?, 0, 0, 0, 0, 0)
+                    ''', (id, str(format)))
 
     # returns stats for a question id
     # time is represented by 10^(-1) seconds
-    def get_stats(id):
+    def get_stats(id, quiz):
         with Connection() as con:
             with con:
                 return con.execute('''
-                SELECT *
+                SELECT question_id,
+                quiz_format,
+                corrects,
+                incorrects,
+                skips,
+                time,
+                abandons
                 FROM statistics
                 WHERE question_id = ?
-                ''', (str(id),)).fetchone()
+                AND quiz_format = ?
+                ''', (str(id), str(quiz))).fetchone()
 
     # increments existing stats by this amount
     def increment_stats(obj):
         new_obj = {}
-        id, new_obj["id"], new_obj["corrects"], new_obj["incorrects"], new_obj["skips"], new_obj["time"] = Statistics.get_stats(obj["id"])
-        for attr in ["corrects", "incorrects", "skips", "time"]:
+        new_obj["id"], new_obj["quiz_format"], new_obj["corrects"], new_obj["incorrects"], new_obj["skips"], new_obj["time"], new_obj["abandons"] = Statistics.get_stats(obj["id"], obj["quiz_format"])
+        for attr in ["corrects", "incorrects", "skips", "time", "abandons"]:
             try:
                 new_obj[attr] += obj[attr]
             except KeyError:
@@ -65,33 +75,44 @@ class Statistics():
                 SET corrects = ?,
                 incorrects = ?,
                 skips = ?,
-                time = ?
+                time = ?,
+                abandons = ?
                 WHERE question_id = ?
+                AND quiz_format = ?
                 ''', (obj["corrects"],
                       obj["incorrects"],
                       obj["skips"],
                       obj["time"],
-                      obj["id"]))
+                      obj["abandons"],
+                      obj["id"],
+                      obj["quiz_format"]))
 
     def load_stats(self):
-        counter = 0
         Question = namedtuple("Question",
-                              ["q_number", "text", "correct", "in1", "in2", "in3", "pc_correct", "pc_abandon", "time"])
+                              ["q_id", "text", "correct", "in1", "in2", "in3", "corrects", "incorrects", "skips", "abandons", "total_time", "quiz"])
         with Connection() as con:
             with con:
-                for id, q_text, correct, in1, in2, in3, stat_id, q_id, corrects, incorrects, skips, time in con.execute('''
-                SELECT * 
-                FROM questions
+                for i, row in enumerate(con.execute('''
+                SELECT questions.id,
+                question,
+                correct,
+                incorrect1,
+                incorrect2,
+                incorrect3,
+                corrects,
+                incorrects,
+                skips,
+                abandons,
+                time,
+                statistics.quiz_format
+                FROM ((questions
                 INNER JOIN statistics
-                ON questions.id = statistics.question_id
-                '''):
-                    counter += 1
-                    answered = corrects + incorrects
-                    abandons = "N/A" if answered + skips <= 0 else round(skips * 100 / (answered + skips))
-                    accuracy = "N/A" if answered <= 0 else round(corrects * 100 / answered)
-                    mean_time = "N/A" if answered <= 0 else round(time / (10 * answered))
-
-                    self.q_bank.append(Question(counter, q_text, correct, in1, in2, in3, accuracy, abandons, mean_time))
+                ON questions.id = statistics.question_id)
+                INNER JOIN packages
+                ON questions.package_id = packages.package_id)
+                ''')):
+                    print(*row)
+                    self.q_bank.append(Question(*row))
 
     def get_overall_stats(self):
         self.load_stats()

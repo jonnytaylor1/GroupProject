@@ -12,23 +12,29 @@ class Welcome(Frame):
         b1 = Button(self, text = "Start", font = ("MS", 8, "bold"))
         b1.grid(row = 3, column = 3, columnspan = 5)
         b1["command"] = self.start_quiz
-        b2 = Button(self, text = "Settings", font = ("MS", 8, "bold"))
-        b2.grid(row = 4, column = 3, columnspan = 5)
-        b2["command"] = self.go_to_settings
-        b3 = Button(self, text = "Statistics", font = ("MS", 8, "bold"))
+#J Goes to packages menu
+        b2 = Button(self, text="Packages Menu", font=("MS", 8, "bold"))
+        b2.grid(row = 4, column = 3, columnspan=5)
+        b2["command"] = self.go_to_packages
+        b3 = Button(self, text="Statistics", font=("MS", 8, "bold"))
         b3.grid(row=5, column=3, columnspan=5)
         b3["command"] = self.go_to_statistics
+        Button(self, text="Hangman", command=lambda x=self: x.go_to_hangman()).grid(row=6, column=3)
 
     # goes to  the Multiple choice page
     def start_quiz(self):
         self.grid_forget()
         self.parent.pages["MultipleChoice"].show()
 
-    # goes to the settings page
-    def go_to_settings(self):
+    # Go to package page
+    def go_to_packages(self):
         self.grid_forget()
-        self.parent.pages["Settings"].grid()
+        self.parent.pages["PackageMenu"].grid()
 
     def go_to_statistics(self):
         self.grid_forget()
         self.parent.pages["Statistics"].grid()
+
+    def go_to_hangman(self):
+        self.grid_forget()
+        self.parent.pages["Hangman"].grid()

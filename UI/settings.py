@@ -49,6 +49,7 @@ class Settings(Frame):
 #J Go back to package menu
     def go_package_menu(self):
         self.grid_forget()
+        self.parent.root.geometry("1000x500")
         self.parent.pages["PackageMenu"].grid()
 
     def save_q(self):
@@ -105,5 +106,6 @@ class Settings(Frame):
         self.refresh()
     def show(self, package_id):
         self.subFrame.destroy()
+        self.parent.root.geometry("1300x500")
         self.list_qs(package_id)
         self.grid()

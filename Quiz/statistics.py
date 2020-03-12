@@ -18,6 +18,7 @@ class Statistics():
             incorrects INTEGER,
             skips INTEGER,
             time INTEGER,
+            abandons INTEGER,
             FOREIGN KEY(question_id) REFERENCES questions(id)
             )''')
 
@@ -28,9 +29,9 @@ class Statistics():
                 for format in range(1,3):
                     con.execute('''
                     INSERT INTO statistics
-                    (question_id, quiz_format, corrects, incorrects, skips, time)
+                    (question_id, quiz_format, corrects, incorrects, skips, abandons, time)
                     VALUES
-                    (?, ?, 0, 0, 0, 0)
+                    (?, ?, 0, 0, 0, 0, 0)
                     ''', (id, str(format)))
 
     # returns stats for a question id
@@ -44,7 +45,8 @@ class Statistics():
                 corrects,
                 incorrects,
                 skips,
-                time
+                time,
+                abandons
                 FROM statistics
                 WHERE question_id = ?
                 AND quiz_format = ?
@@ -53,8 +55,8 @@ class Statistics():
     # increments existing stats by this amount
     def increment_stats(obj):
         new_obj = {}
-        new_obj["id"], new_obj["quiz_format"], new_obj["corrects"], new_obj["incorrects"], new_obj["skips"], new_obj["time"] = Statistics.get_stats(obj["id"], obj["quiz_format"])
-        for attr in ["corrects", "incorrects", "skips", "time"]:
+        new_obj["id"], new_obj["quiz_format"], new_obj["corrects"], new_obj["incorrects"], new_obj["skips"], new_obj["time"], new_obj["abandons"] = Statistics.get_stats(obj["id"], obj["quiz_format"])
+        for attr in ["corrects", "incorrects", "skips", "time", "abandons"]:
             try:
                 new_obj[attr] += obj[attr]
             except KeyError:
@@ -73,19 +75,21 @@ class Statistics():
                 SET corrects = ?,
                 incorrects = ?,
                 skips = ?,
-                time = ?
+                time = ?,
+                abandons = ?
                 WHERE question_id = ?
                 AND quiz_format = ?
                 ''', (obj["corrects"],
                       obj["incorrects"],
                       obj["skips"],
                       obj["time"],
+                      obj["abandons"],
                       obj["id"],
                       obj["quiz_format"]))
 
     def load_stats(self):
         Question = namedtuple("Question",
-                              ["q_id", "text", "correct", "in1", "in2", "in3", "corrects", "incorrects", "skips", "total_time", "quiz"])
+                              ["q_id", "text", "correct", "in1", "in2", "in3", "corrects", "incorrects", "skips", "abandons", "total_time", "quiz"])
         with Connection() as con:
             with con:
                 for i, row in enumerate(con.execute('''
@@ -98,6 +102,7 @@ class Statistics():
                 corrects,
                 incorrects,
                 skips,
+                abandons,
                 time,
                 statistics.quiz_format
                 FROM ((questions

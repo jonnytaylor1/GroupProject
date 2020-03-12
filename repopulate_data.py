@@ -1,12 +1,21 @@
 from Quiz.multiplechoice import Multiplechoice
 from Quiz.package import Package
 from Quiz.statistics import Statistics
+from data.connection import Connection
 import random
 
+# !!Nukes current data!!
+for t_name in ["questions", "statistics", "packages"]:
+    with Connection() as con:
+        with con:
+            con.execute("DROP TABLE IF EXISTS " + t_name)
+
+# Ensures that databases are created
 Multiplechoice()
 Statistics()
 Package()
 
+# helper function
 def gen_num():
     return str(random.randint(100, 999))
 

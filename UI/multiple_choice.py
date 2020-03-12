@@ -56,12 +56,17 @@ class MultipleChoice(Frame):
             b.grid(row = 6 + i, column=5)
             self.choices.append(b)
 
+    def early_restart(self):
+        self.stats["total_time"] += self.parent.diff
+        Statistics.increment_stats(
+            {"id": self.q_id, "time": int(self.parent.diff * 10), "abandons": 1, "quiz_format": 1})
+        self.show()
+
     # record as skipped question when you end quiz prematurely
     def end_quiz(self):
         self.grid_remove()
-        self.stats["skipped_qs"] += 1
         self.stats["total_time"] += self.parent.diff
-        Statistics.increment_stats({"id": self.q_id, "time": int(self.parent.diff * 10), "skips": 1, "quiz_format": 1})
+        Statistics.increment_stats({"id": self.q_id, "time": int(self.parent.diff * 10), "abandons": 1, "quiz_format": 1})
         # show final statistics for the quiz
         self.parent.pages["EndScreen"].show(self.stats)
 

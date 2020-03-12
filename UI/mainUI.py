@@ -16,7 +16,8 @@ class MainUI():
                       "MultipleChoice": MultipleChoice(self),
                       "PackageMenu": PackageMenu(self),
                       "EndScreen": EndScreen(self),
-                      "Statistics": Statistics(self)}
+                      "Statistics": Statistics(self),
+                      "Hangman": Hangman(self)}
 
         # this is the first page to show
         self.curr_window = self.pages["Welcome"]

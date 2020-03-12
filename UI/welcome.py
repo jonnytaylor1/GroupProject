@@ -19,6 +19,7 @@ class Welcome(Frame):
         b3 = Button(self, text="Statistics", font=("MS", 8, "bold"))
         b3.grid(row=5, column=3, columnspan=5)
         b3["command"] = self.go_to_statistics
+        Button(self, text="Hangman", command=lambda self=self: self.go_to_hangman()).grid(row=6, column=3)
 
     # goes to  the Multiple choice page
     def start_quiz(self):
@@ -33,3 +34,7 @@ class Welcome(Frame):
     def go_to_statistics(self):
         self.grid_forget()
         self.parent.pages["Statistics"].grid()
+
+    def go_to_hangman(self):
+        self.grid_forget()
+        self.parent.pages["Hangman"].grid()

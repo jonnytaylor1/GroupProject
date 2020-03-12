@@ -7,7 +7,7 @@ from PIL import Image, ImageTk
 class Hangman(Frame):
     def __init__(self, parent):
         self.parent = parent
-        Frame.__init__(self, parent)
+        Frame.__init__(self, parent.root)
 
         # root.tag_raise(canvas)
 
@@ -28,7 +28,7 @@ class Hangman(Frame):
 
         # image = PhotoImage(file="image1.png")
 
-        image = Image.open("image1.png")
+        image = Image.open("./src/image1.png")
         image = image.resize((200, 200))
         imagetk = ImageTk.PhotoImage(image)
         canvas = Label(self, image=imagetk)
@@ -50,12 +50,3 @@ class Hangman(Frame):
 
 
 #Main
-root = Tk()
-root.title("H Quiz")
-root.geometry("1000x500")
-app = Hangman(root)
-app.grid()
-
-
-
-root.mainloop()

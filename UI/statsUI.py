@@ -26,7 +26,8 @@ class StatsTable(Treeview):
         self.create_table()
 
         # no db yet so invent some data
-        self.data = {data for data in StatDB().get_overall_stats() if data.quiz == quiz}
+        self.data = [data for data in StatDB().get_overall_stats() if data.quiz == quiz]
+        print(self.data[0])
         self.insert_data(self.data)
 
         # initial sort by question number after creation, just in case
@@ -52,7 +53,7 @@ class StatsTable(Treeview):
         for item in data:
             self.insert("", 0, text=f"{item.q_id}",
                         values=[f"Question {item.q_id}",
-                                f"{item.total_time}s", f"{item.corrects}%", f"{item.abandons}%"])
+                                f"{item.total_time}s", f"{item.successes}%", f"{item.abandons}%"])
 
     # https://stackoverflow.com/questions/46618459/tkinter-treeview-column-sorting
     def sort_column(self, sort_col, reverse):

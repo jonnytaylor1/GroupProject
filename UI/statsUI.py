@@ -7,12 +7,9 @@ from matplotlib.figure import Figure
 
 from typing import List
 
-#this function returns a list of named tuples that have question info and statistics
+# this function returns a list of named tuples that have question info and statistics
 from Quiz.statistics import Statistics as StatDB
-stats = StatDB().get_overall_stats()
 
-
-QuestionStats = namedtuple("QuestionStatistic", ["q_number", "time", "pc_correct", "pc_abandon"])
 StatsCol = namedtuple("StatsCol", ["name", "heading"])
 
 
@@ -29,22 +26,8 @@ class StatsTable(Treeview):
         self.create_table()
 
         # no db yet so invent some data
-        if quiz == 1:
-            self.dummy_data = [QuestionStats(1, 20, 70, 30),
-                               QuestionStats(2, 50, 50, 9),
-                               QuestionStats(4, 40, 30, 5),
-                               QuestionStats(5, 10, 60, 10),
-                               QuestionStats(6, 90, 10, 90),
-                               QuestionStats(10, 15, 40, 4)]
-        else:
-            self.dummy_data = [QuestionStats(1, 60, 34, 10),
-                               QuestionStats(2, 20, 56, 7),
-                               QuestionStats(4, 30, 45, 3),
-                               QuestionStats(5, 70, 76, 50),
-                               QuestionStats(6, 10, 67, 7),
-                               QuestionStats(10, 50, 34, 6)]
-
-        self.insert_data(self.dummy_data)
+        self.data = {data for data in StatDB().get_overall_stats() if data.quiz == quiz}
+        self.insert_data(self.data)
 
         # initial sort by question number after creation, just in case
         self.sort_column(self.table_columns[0], False)
@@ -63,13 +46,13 @@ class StatsTable(Treeview):
         # hide the first column which has no heading and is pretty useless
         self["show"] = "headings"
 
-    def insert_data(self, data: List[QuestionStats]):
-        # FIXME: Dummy datL
+    def insert_data(self, data):
+        # FIXME: Dummy data
 
         for item in data:
-            self.insert("", 0, text=f"{item.q_number}",
-                        values=[f"Question {item.q_number}",
-                                f"{item.time}s", f"{item.pc_correct}%", f"{item.pc_abandon}%"])
+            self.insert("", 0, text=f"{item.q_id}",
+                        values=[f"Question {item.q_id}",
+                                f"{item.total_time}s", f"{item.corrects}%", f"{item.abandons}%"])
 
     # https://stackoverflow.com/questions/46618459/tkinter-treeview-column-sorting
     def sort_column(self, sort_col, reverse):
@@ -93,6 +76,7 @@ class StatsTable(Treeview):
                 self.heading(col.name, text=col.heading,
                              command=lambda col=col: self.sort_column(col, False))
 
+
 class QuizView(Frame):
     """This class provides the view for an individual quiz inside each tab"""
 
@@ -106,7 +90,7 @@ class QuizView(Frame):
                                       height=stats_table_row_number, yscrollcommand=self.table_scrollbar.set)
         self.table_scrollbar.config(command=self.stats_table.yview)
 
-        self.data = self.stats_table.dummy_data
+        self.data = self.stats_table.data
 
         # FIXME: padding
         self.stats_table.grid(row=2, column=1, columnspan=2, padx=(50, 0), pady=(10, 5))
@@ -123,7 +107,7 @@ class QuizView(Frame):
         self.fig = Figure(figsize=(5, 2), dpi=100)
         self.bar_chart = self.fig.add_subplot(111)
 
-        self.bar_chart.bar([i.q_number for i in self.data], [i.time for i in self.data])
+        self.bar_chart.bar([i.q_id for i in self.data], [i.total_time for i in self.data])
 
         # Figures are drawn on Canvases
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)

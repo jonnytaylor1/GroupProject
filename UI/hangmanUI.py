@@ -24,7 +24,7 @@ class Hangman(Frame):
             Label(self, text = "").grid(row=9, column=7)
             Button(self, text = "Skip").grid(row=10, column =7, columnspan=2, sticky=E)
             Button(self, text = "Restart").grid(row=10, column =9, columnspan=3)
-            Button(self, text = "End Quiz").grid(row=10, column =12, columnspan=3, sticky = W)
+            Button(self, text = "End Quiz", command=lambda x=self: self.go_to_welcome()).grid(row=10, column =12, columnspan=3, sticky = W)
 
         # image = PhotoImage(file="image1.png")
 
@@ -33,8 +33,12 @@ class Hangman(Frame):
         imagetk = ImageTk.PhotoImage(image)
         canvas = Label(self, image=imagetk)
         canvas.image = imagetk
-
         canvas.grid(row=4, column=1, rowspan=11, columnspan = 5)
+
+
+    def go_to_welcome(self):
+        self.grid_forget()
+        self.parent.pages["Welcome"].grid()
 
 
 

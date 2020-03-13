@@ -89,7 +89,7 @@ class Statistics():
 
     def load_stats(self):
         Question = namedtuple("Question",
-                              ["q_id", "text", "correct", "in1", "in2", "in3", "corrects", "incorrects", "skips", "abandons", "total_time", "quiz"])
+                              ["q_id", "text", "correct", "in1", "in2", "in3", "successes", "failures", "skips", "abandons", "total_time", "quiz"])
         with Connection() as con:
             with con:
                 for i, row in enumerate(con.execute('''

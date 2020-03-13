@@ -32,3 +32,9 @@ class Hangman():
                     print(row[0])
                     bank.append(
                         {"id": row[0], "text": row[1], "correct": row[2], "incorrect": [row[3], row[4], row[5]]})
+        if random:
+            shuffle(bank)
+        for question in bank:
+            choices = [question["correct"]] + question["incorrect"]
+            shuffle(choices)
+            yield (question["id"], question["text"], choices, question["correct"])

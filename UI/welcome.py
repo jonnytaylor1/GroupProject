@@ -7,19 +7,21 @@ class Welcome(Frame):
         self.create_welcome()
 
     def create_welcome(self):
-        l = Label(self, text = "Welcome!", font = ("MS", 15, "bold"))
-        l.grid(row = 2, column = 2, columnspan = 4)
-        b1 = Button(self, text = "Start", font = ("MS", 8, "bold"))
-        b1.grid(row = 3, column = 3, columnspan = 5)
+        l = Label(self, text = "Welcome!", font = ("MS", 110, "bold"))
+        l.grid(row = 2, column = 5, columnspan = 4)
+        b1 = Button(self, text = "Multiple Choice Quiz", font = ("MS", 20, "bold"))
+        b1.grid(row = 20, column = 5, columnspan = 4,rowspan= 3)
         b1["command"] = self.start_quiz
+        b4 = Button(self, text="Hangman", font = ("MS", 20, "bold"), command=lambda x=self: x.go_to_hangman())
+        b4.grid(row=25, column=5, columnspan=4, rowspan = 3)
+	
 #J Goes to packages menu
-        b2 = Button(self, text="Packages Menu", font=("MS", 8, "bold"))
-        b2.grid(row = 4, column = 3, columnspan=5)
+        b2 = Button(self, text="Packages Menu", font=("MS", 20, "bold"))
+        b2.grid(row = 30, column = 5, columnspan=4, rowspan = 3)
         b2["command"] = self.go_to_packages
-        b3 = Button(self, text="Statistics", font=("MS", 8, "bold"))
-        b3.grid(row=5, column=3, columnspan=5)
+        b3 = Button(self, text="Statistics", font=("MS", 20, "bold"))
+        b3.grid(row=40, column=5, columnspan=4, rowspan = 3)
         b3["command"] = self.go_to_statistics
-        Button(self, text="Hangman", command=lambda x=self: x.go_to_hangman()).grid(row=6, column=3)
 
     # goes to  the Multiple choice page
     def start_quiz(self):

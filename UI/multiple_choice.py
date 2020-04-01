@@ -3,13 +3,20 @@ import time
 import tkinter.messagebox
 from Quiz.multiplechoice import Multiplechoice
 from Quiz.statistics import Statistics
+
+
 class MultipleChoice(Frame):
     def __init__(self, parent):
         self.parent = parent
         Frame.__init__(self, parent.root)
+
         self.create_questions()
 
     def show(self):
+        self.parent.root.geometry("750x500")
+        self.grid(row=0, column=0, sticky=N + S + E + W) # Makes a responsive grid
+        Grid.rowconfigure(self.parent.root, 0, weight=1)
+        Grid.columnconfigure(self.parent.root, 0, weight=1)
         self.grid()
         # get data on questions from the model
         self.qIter = Multiplechoice.get_multiplechoice_qs(True)
@@ -34,26 +41,46 @@ class MultipleChoice(Frame):
         # load next question
         self.load_questions()
 
+    @staticmethod
+    def bind_hover(element, bind=True):
+        """
+
+        :param element: Button element on which the hover is applied
+        :param bind: argument that decides whether the hover is to be added or removed
+        :return:
+        """
+        if bind:
+            element.bind("<Enter>", lambda event, h=element: h.configure(bg="#a6a6a6", fg="#ffffff"))  # Add the color of the background and font
+            element.bind("<Leave>", lambda event, h=element: h.configure(bg="#e8e6e6", fg="#000000"))
+        else:
+            element.unbind("<Enter>")
+            element.unbind("<Leave>")
+
     # create question form for the multiple choice
     def create_questions(self):
-        self.q_num = Label(self, text = "Question 1: ", font = ("MS", 8, "bold"))
-        self.q_num.grid(row = 2, column = 4)
+        for rows in range(8):
+            Grid.rowconfigure(self, rows, weight=1)
+        for columns in range(3):
+            Grid.columnconfigure(self, columns, weight=1)
+
+        self.q_num = Label(self, text="Question 1: ", font=("MS", 8, "bold"))
+        self.q_num.grid(row=0, column=0, columnspan=3, sticky=N+S+E+W)
         self.q_text = Label(self, text="Answer A is correct? ", font=("MS", 8, "bold"))
-        self.q_text.grid(row=3, column=4)
-        self.l_timer = Label(self, text = "Time Elapsed:")
-        self.l_timer.grid(row=3, column=5)
+        self.q_text.grid(row=1, column=0, columnspan=3, sticky=N+S+E+W)
+        self.l_timer = Label(self, text="Time Elapsed:")
+        self.l_timer.grid(row=2, column=0, sticky=N+S+E+W)
         self.timer = Label(self, textvariable=self.parent.timer)
-        self.timer.grid(row=3, column=6)
+        self.timer.grid(row=2, column=1, sticky=N+S+E+W)
         self.choices = []
-        self.b_next = Button(self, text="Skip?", command=self.skip_q)
-        self.b_next.grid(row=7, column=6)
+        self.b_next = Button(self, text="Skip", command=self.skip_q)
+        self.b_next.grid(row=3, column=0, sticky=N+S+E+W)
         self.b_restart = Button(self, text="Restart", command=self.show)
-        self.b_restart.grid(row=7, column=7)
+        self.b_restart.grid(row=3, column=1, sticky=N+S+E+W)
         self.b_end = Button(self, text="End Quiz", command=self.end_quiz)
-        self.b_end.grid(row=7, column=8)
+        self.b_end.grid(row=3, column=2, sticky=N+S+E+W)
         for i, answer in enumerate(list("abcd")):
-            b = Button(self, text = answer, font=("MS", 8, "bold"))
-            b.grid(row = 6 + i, column=5)
+            b = Button(self, text=answer, font=("MS", 8, "bold"))
+            b.grid(row=4+i, column=0, columnspan=3, sticky=N+S+E+W)
             self.choices.append(b)
 
     def early_restart(self):
@@ -75,16 +102,18 @@ class MultipleChoice(Frame):
         try:
             self.q_id, q_text, choices, correct = next(self.qIter)
             for choice in self.choices:
-                choice["bg"] = "grey"
+                choice["bg"] = "#e8e6e6"
+                choice["fg"] = "#000000"
+                self.bind_hover(choice)
                 choice["state"] = NORMAL
             self.b_next["command"] = self.skip_q
-            self.b_next["text"] = "Skip?"
-            self.b_end.grid()
-            self.timer.grid()
+            self.b_next["text"] = "Skip"
+            self.b_end.grid(row=3, column=2, sticky=N+S+E+W)
+
             self.parent.clock1 = time.time()
             self.parent.timer.set("00:00")
-            self.timer.grid()
-            self.l_timer.grid()
+            self.timer.grid(row=2, column=1, sticky=N+S+E+W)
+            self.l_timer.grid(row=2, column=0, sticky=N+S+E+W)
             self.num += 1
             self.q_num["text"] = f"Question {self.num}:"
             self.q_text["text"] = q_text
@@ -101,6 +130,7 @@ class MultipleChoice(Frame):
         for choice in self.choices:
             # lock ability to choose another answer
             choice["state"] = DISABLED
+            self.bind_hover(choice,bind=False)
         if button["text"] == correct:
             button["bg"] = "green"
             self.stats["correct_qs"] += 1
@@ -127,6 +157,8 @@ class MultipleChoice(Frame):
         self.b_next["text"] = "Next Question"
         self.b_next["command"] = self.load_questions
 # Generate the end screen frame
+
+
 class EndScreen(Frame):
 
     def __init__(self, parent):
@@ -134,8 +166,18 @@ class EndScreen(Frame):
         self.parent = parent
         self.create_stat_page()
     # fill statistics for the quiz
+
     def show(self, stats):
+        self.parent.root.geometry("1000x500")
+        self.grid(row=0, column=0, sticky=N + S + E + W)
+        Grid.rowconfigure(self.parent.root, 0, weight=1)
+        Grid.columnconfigure(self.parent.root, 0, weight=1)
         self.grid()
+        for rows in range(10):
+            Grid.rowconfigure(self, rows, weight=1)
+        for columns in range(3):
+            Grid.columnconfigure(self, columns, weight=1)
+
         total = stats["incorrect_qs"] + stats["correct_qs"] + stats["skipped_qs"]
         self.l_incorrect_answers["text"] = stats["incorrect_qs"]
         self.l_correct_answers["text"] = stats["correct_qs"]
@@ -143,14 +185,14 @@ class EndScreen(Frame):
         self.l_total_answers["text"] = total
         time = int(stats["total_time"])
         self.l_total_time["text"] = f"{time // 600}{(time // 60) % 10}:{(time // 10) % 6}{time % 10}"
-        self.subFrame = Frame(self)
-        self.subFrame.grid(column=3, row=2, rowspan=10)
+        # self.subFrame = Frame(self)
+        # self.subFrame.grid(row=0, column=0)
 
         for i,q in enumerate(stats["qs"]):
             id, question, corr, inc1, inc2, inc3 = Multiplechoice.get_question(q["q_id"])
             text = f"{i + 1}. {question} {q['answer'] if q['answer'] else 'Skipped'}."
-            l = Label(self.subFrame)
-            l.grid(row=1 + i, column=1)
+            l = Label(self, anchor='w', justify='left')
+            l.grid(row=0 + i, column=2)
             if q["status"] == "correct":
                 l["fg"] = "green"
             elif q["status"] == "incorrect":
@@ -164,35 +206,37 @@ class EndScreen(Frame):
             l["text"] = text
 
     def go_menu(self):
-        self.subFrame.destroy()
+        # self.subFrame.destroy()
         self.grid_remove()
-        self.parent.pages["Welcome"].grid()
+        self.parent.pages["Welcome"].show()
+
     #  restart the quiz
     def restart(self):
-        self.subFrame.destroy()
+        # self.subFrame.destroy()
         self.grid_remove()
         self.parent.pages["MultipleChoice"].show()
+
     # create form for the stats to fill
     def create_stat_page(self):
-        Label(self, text = "Incorrect Answers:").grid(row=2, column=1)
-        Label(self, text = "Correct Answers:").grid(row=3, column=1)
-        Label(self, text = "Skipped Answers:").grid(row=4, column=1)
-        Label(self, text = "Total Questions:").grid(row=5, column=1)
-        Label(self, text = "Total Time Spent:").grid(row=6, column=1)
+        Label(self, text="Incorrect Answers:").grid(row=0, column=0)
+        Label(self, text="Correct Answers:").grid(row=1, column=0)
+        Label(self, text="Skipped Answers:").grid(row=2, column=0)
+        Label(self, text="Total Questions:").grid(row=3, column=0)
+        Label(self, text="Total Time Spent:").grid(row=4, column=0)
 
-        self.l_incorrect_answers = Label(self, text = "Incorrect Answers")
-        self.l_incorrect_answers.grid(row=2, column=2)
-        self.l_correct_answers = Label(self, text = "Correct Answers")
-        self.l_correct_answers.grid(row=3, column=2)
-        self.l_skipped_answers = Label(self, text = "Skipped Answers")
-        self.l_skipped_answers.grid(row=4, column=2)
-        self.l_total_answers = Label(self, text = "Total Answers")
-        self.l_total_answers.grid(row=5, column=2)
-        self.l_total_time = Label(self, text = "Total Time Spent")
-        self.l_total_time.grid(row=6, column=2)
-
-
+        self.l_incorrect_answers = Label(self, text="Incorrect Answers")
+        self.l_incorrect_answers.grid(row=0, column=1)
+        self.l_correct_answers = Label(self, text="Correct Answers")
+        self.l_correct_answers.grid(row=1, column=1)
+        self.l_skipped_answers = Label(self, text="Skipped Answers")
+        self.l_skipped_answers.grid(row=2, column=1)
+        self.l_total_answers = Label(self, text="Total Answers")
+        self.l_total_answers.grid(row=3, column=1)
+        self.l_total_time = Label(self, text="Total Time Spent")
+        self.l_total_time.grid(row=4, column=1)
 
 
-        Button(self, text="Menu", command=self.go_menu).grid(row=7, column=1)
-        Button(self, text="Restart", command=self.restart).grid(row=7, column=2)
+
+
+        Button(self, text="Menu", command=self.go_menu).grid(row=5, column=0, sticky=N+S+E+W)
+        Button(self, text="Restart", command=self.restart).grid(row=5, column=1, sticky=N+S+E+W)

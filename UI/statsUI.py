@@ -100,9 +100,6 @@ class QuizView(Frame):
         # self.separator = Separator(self)
         # self.separator.grid(row=3, column=1, columnspan=3, sticky="we")
 
-        self.extra_text = Label(self, text="We can say something here \n about best/worst\n questions")
-        self.extra_text.grid(row=4, column=1)
-
         # FIXME: fake graph
         # graph lives in a Figure
         self.fig = Figure(figsize=(5, 2), dpi=100)
@@ -115,7 +112,8 @@ class QuizView(Frame):
         self.canvas.draw()
         # Canvases can be added to the grid
         # FIXME: padding
-        self.canvas.get_tk_widget().grid(row=4, column=2, pady=(5, 10))
+        self.canvas.get_tk_widget().grid(row=4, column=1, columnspan=1, pady=(5, 10))
+
 
 
 class Statistics(Frame):
@@ -124,9 +122,8 @@ class Statistics(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent.root)
         self.parent = parent
-
-        self.hello_world = Label(self, text="Hello World! \n This is where the statistics will be")
-        self.hello_world.grid(row=1, column=1, columnspan=2)
+        self.back_button = Button(self, text="< Back", command=self.back)
+        self.back_button.grid(row=1, padx=(10, 0), pady=(10, 5))
 
         # hide border
         # https://groups.google.com/forum/#!topic/comp.lang.tcl/8a6e4tfWJvo
@@ -147,3 +144,7 @@ class Statistics(Frame):
         self.button.grid(row=3, column=1, sticky="e")
         self.button_two = Button(self, text="This button also does nothing")
         self.button_two.grid(row=3, column=2, sticky="w")
+
+    def back(self):
+        self.grid_forget()
+        self.parent.pages["Welcome"].grid()

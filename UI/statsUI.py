@@ -10,7 +10,7 @@ from typing import List
 # this function returns a list of named tuples that have question info and statistics
 from Quiz.statistics import Statistics as StatDB
 
-StatsCol = namedtuple("StatsCol", ["name", "heading", "width"])
+StatsCol = namedtuple("StatsCol", ["name", "heading", "type", "width", "anchor"])
 
 
 class StatsTable(Treeview):
@@ -19,11 +19,12 @@ class StatsTable(Treeview):
     def __init__(self, parent, quiz, **kwargs):
         super().__init__(parent, **kwargs)
 
-        self.table_columns = [StatsCol("number", "Question Number", 200),
-                              StatsCol("count", "Count", 100),
-                              StatsCol("time", "Mean Time", 175),
-                              StatsCol("correct", "Accuracy", 175),
-                              StatsCol("abandoned", "Abandoned", 175)]
+        self.table_columns = [StatsCol("number", "#", int, 25, E),
+                              StatsCol("question", "Question", str, 350, W),
+                              StatsCol("count", "Count", int, 100, E),
+                              StatsCol("time", "Mean Time", float, 125, E),
+                              StatsCol("correct", "Accuracy", float, 125, E),
+                              StatsCol("abandoned", "Abandoned", int, 125, E)]
         self.create_table()
 
         # no db yet so invent some data
@@ -45,7 +46,7 @@ class StatsTable(Treeview):
         for col in self.table_columns:
             self.heading(col.name, text=col.heading,
                          command=lambda col=col: self.sort_column(col, False))
-            self.column(col.name, width=col.width, anchor=E)
+            self.column(col.name, width=col.width, anchor=col.anchor)
         # hide the first column which has no heading and is pretty useless
         self["show"] = "headings"
 
@@ -54,13 +55,17 @@ class StatsTable(Treeview):
 
         for item in data:
             self.insert("", 0, text=f"{item.q_id}",
-                        values=[f"Question {item.q_id}",
-                                f"{item.total_time}s", f"{item.successes}%", f"{item.abandons}%"])
+                        values=[f"{item.q_id}",
+                                f"{item.text}",
+                                f"{item.successes + item.failures + item.skips + item.abandons}",
+                                f"{item.total_time}s",
+                                f"{item.successes}%",
+                                f"{item.abandons}%"])
 
     # https://stackoverflow.com/questions/46618459/tkinter-treeview-column-sorting
     def sort_column(self, sort_col, reverse):
         l = [(self.set(k, sort_col.name), k) for k in self.get_children('')]
-        l.sort(key=lambda x: float(x[0].strip('%Question')), reverse=reverse)
+        l.sort(key=lambda x: sort_col.type(x[0].strip('%s')), reverse=reverse)
 
         # rearrange items in sorted positions
         for index, (val, k) in enumerate(l):
@@ -73,7 +78,7 @@ class StatsTable(Treeview):
         # reverse sort next time
         for col in self.table_columns:
             if col.name == sort_col.name:
-                self.heading(col.name, text=f"{col.heading}{sort_indicator}",
+                self.heading(col.name, text=f"{col.heading} {sort_indicator}",
                              command=lambda col=col: self.sort_column(col, not reverse))
             else:
                 self.heading(col.name, text=col.heading,
@@ -117,6 +122,17 @@ class QuizView(Frame):
         self.canvas.get_tk_widget().grid(row=4, column=1, columnspan=1, pady=(5, 10))
 
 
+class BottomButtons(Frame):
+    """This class provides the buttons that sit at the bottom of the page"""
+
+    def __init__(self, parent, *args, **kwargs):
+        Frame.__init__(self, parent, *args, **kwargs)
+        self.parent = parent
+        self.button = Button(self, text="Export as CSV")
+        self.button.grid(row=3, column=0, sticky="e")
+        self.button_two = Button(self, text="Export HTML report")
+        self.button_two.grid(row=3, column=1, sticky="w")
+
 
 class Statistics(Frame):
     """This class provides the statistics view, in table and graphical form"""
@@ -124,6 +140,7 @@ class Statistics(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent.root)
         self.parent = parent
+        self.columnconfigure(0, weight=1)
         self.back_button = Button(self, text="< Back", command=self.back)
         self.back_button.grid(row=1, padx=(10, 0), pady=(10, 5), sticky="w")
 
@@ -140,12 +157,10 @@ class Statistics(Frame):
         self.tabbed_section.add(self.quiz_two, text="Quiz 2")
 
         # FIXME: padding
-        self.tabbed_section.grid(row=2, columnspan=3, padx=10, sticky="we")
+        self.tabbed_section.grid(row=2, padx=20, sticky="n")
 
-        self.button = Button(self, text="This button does nothing")
-        self.button.grid(row=3, column=0, columnspan=2, sticky="e")
-        self.button_two = Button(self, text="This button also does nothing")
-        self.button_two.grid(row=3, column=2, sticky="w")
+        self.buttons = BottomButtons(self)
+        self.buttons.grid(row=3, sticky="n")
 
     def back(self):
         self.grid_forget()

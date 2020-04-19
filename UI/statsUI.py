@@ -10,7 +10,7 @@ from typing import List
 # this function returns a list of named tuples that have question info and statistics
 from Quiz.statistics import Statistics as StatDB
 
-StatsCol = namedtuple("StatsCol", ["name", "heading"])
+StatsCol = namedtuple("StatsCol", ["name", "heading", "width"])
 
 
 class StatsTable(Treeview):
@@ -19,10 +19,11 @@ class StatsTable(Treeview):
     def __init__(self, parent, quiz, **kwargs):
         super().__init__(parent, **kwargs)
 
-        self.table_columns = [StatsCol("number", "Question Number"),
-                              StatsCol("time", "Mean Time"),
-                              StatsCol("correct", "Accuracy"),
-                              StatsCol("abandoned", "Abandoned")]
+        self.table_columns = [StatsCol("number", "Question Number", 200),
+                              StatsCol("count", "Count", 100),
+                              StatsCol("time", "Mean Time", 175),
+                              StatsCol("correct", "Accuracy", 175),
+                              StatsCol("abandoned", "Abandoned", 175)]
         self.create_table()
 
         # no db yet so invent some data
@@ -44,6 +45,7 @@ class StatsTable(Treeview):
         for col in self.table_columns:
             self.heading(col.name, text=col.heading,
                          command=lambda col=col: self.sort_column(col, False))
+            self.column(col.name, width=col.width, anchor=E)
         # hide the first column which has no heading and is pretty useless
         self["show"] = "headings"
 
@@ -94,8 +96,8 @@ class QuizView(Frame):
         self.data = self.stats_table.data
 
         # FIXME: padding
-        self.stats_table.grid(row=2, column=1, columnspan=2, padx=(50, 0), pady=(10, 5))
-        self.table_scrollbar.grid(row=2, column=3, sticky="ns", padx=(0, 50), pady=(10, 5))
+        self.stats_table.grid(row=2, column=1, columnspan=3, padx=(50, 0), pady=(10, 5))
+        self.table_scrollbar.grid(row=2, column=4, sticky="ns", padx=(0, 50), pady=(10, 5))
 
         # self.separator = Separator(self)
         # self.separator.grid(row=3, column=1, columnspan=3, sticky="we")
@@ -123,7 +125,7 @@ class Statistics(Frame):
         Frame.__init__(self, parent.root)
         self.parent = parent
         self.back_button = Button(self, text="< Back", command=self.back)
-        self.back_button.grid(row=1, padx=(10, 0), pady=(10, 5))
+        self.back_button.grid(row=1, padx=(10, 0), pady=(10, 5), sticky="w")
 
         # hide border
         # https://groups.google.com/forum/#!topic/comp.lang.tcl/8a6e4tfWJvo
@@ -138,10 +140,10 @@ class Statistics(Frame):
         self.tabbed_section.add(self.quiz_two, text="Quiz 2")
 
         # FIXME: padding
-        self.tabbed_section.grid(row=2, column=1, columnspan=2, padx=10)
+        self.tabbed_section.grid(row=2, columnspan=3, padx=10, sticky="we")
 
         self.button = Button(self, text="This button does nothing")
-        self.button.grid(row=3, column=1, sticky="e")
+        self.button.grid(row=3, column=0, columnspan=2, sticky="e")
         self.button_two = Button(self, text="This button also does nothing")
         self.button_two.grid(row=3, column=2, sticky="w")
 

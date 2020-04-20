@@ -44,7 +44,6 @@ class Welcome(Frame):
         b3 = Button(self, text="Statistics", font=("MS", 8, "bold"))
         self.bind_hover(b3)
         b3.grid(row=3, column=0, sticky=N+S+E+W)
-
         b3["command"] = self.go_to_statistics
 
         b4 = Button(self, text="Hangman", font=("MS", 8, "bold"),command=lambda x=self: x.go_to_hangman())

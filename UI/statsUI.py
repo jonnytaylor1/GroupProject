@@ -28,7 +28,8 @@ class StatsTable(Treeview):
         self.create_table()
 
         # no db yet so invent some data
-        self.data = [data for data in StatDB().get_overall_stats() if data.quiz == quiz]
+        #if you want to show only stats for questions that are currently loaded into the quiz check if currently assigned like below:
+        self.data = [data for data in StatDB().get_overall_stats_old() if data.quiz == quiz and data.currently_assigned]
         print(self.data[0])
         self.insert_data(self.data)
 

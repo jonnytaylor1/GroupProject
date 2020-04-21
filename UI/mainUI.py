@@ -3,11 +3,15 @@ from UI import *
 import time
 
 # this is the main controller for UI pages
+
+
 class MainUI():
+
     def __init__(self):
         self.root = Tk()
         self.root.title("Quiz")
-        self.root.geometry("1000x500")
+        self.root.geometry("400x400")
+
         self.timer = StringVar()
         self.clock1 = time.time()
         # specify here which page you would like to add

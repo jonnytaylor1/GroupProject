@@ -176,7 +176,7 @@ class Statistics():
 
     def load_stats2(self):
         Question = namedtuple("Question",
-                              ["currently_assigned", "q_id", "text", "correct", "in1", "in2", "in3", "time", "status", "created_at", "package_id", "quiz" ])
+                              ["currently_assigned", "q_id", "text", "correct", "in1", "in2", "in3", "time", "status", "created_at", "package_id", "package_name", "quiz" ])
         with Connection() as con:
             with con:
                 for i, row in enumerate(con.execute('''
@@ -190,6 +190,7 @@ class Statistics():
                 status,
                 created_at,
                 questions.package_id,
+                packages.name,
                 answer_stats.quiz_format,
                 packages.quiz_format
                 FROM ((answer_stats
@@ -209,7 +210,7 @@ class Statistics():
         self.load_stats2()
         Question = namedtuple("Question",
                               ["currently_assigned", "q_id", "text", "correct", "in1", "in2", "in3", "times", "status",
-                               "created_at", "quiz", "package_id"])
+                               "created_at", "package_id", "package_name", "quiz"])
         def data_reducer(acc, q):
             for y in acc:
                 if(q.q_id == y.q_id and q.quiz == y.quiz):

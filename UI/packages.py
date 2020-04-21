@@ -48,6 +48,13 @@ class PackageMenu(Frame):
         self.add_new_package_b = Button(self.subFrame, text="Add new Package", command=lambda: self.create_p_form(row + 1))
         self.add_new_package_b.grid(row = row + 1, column = 3)
         Button(self.subFrame, text="Back - Main Menu", command = self.go_menu).grid(row=row + 2, column=3)
+
+
+
+        # self.subFrame.config(yscrollcommand=scrollbar.set)
+        # scrollbar.config(command=self.subFrame.yview)
+
+
         # left for debugging purposes
         Button(self.subFrame, text="Refresh", command=self.refresh).grid(row=row + 3, column=3)
 

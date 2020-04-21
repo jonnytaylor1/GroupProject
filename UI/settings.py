@@ -45,6 +45,11 @@ class Settings(Frame):
         # left for debugging purposes
         Button(self.subFrame, text = "Refresh", command = self.refresh).grid(row = row + 3, column = 3)
 
+        # scrollbar.config(command = )
+
+        # listbox = Listbox(self.subFrame, yscrollcommand = scrollbar.set)
+
+
 
 #J Go back to package menu
     def go_package_menu(self):

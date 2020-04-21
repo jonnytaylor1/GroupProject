@@ -1,7 +1,11 @@
 
 from Quiz.hangman import Hangman
 from Quiz.statistics import Statistics
-print(Hangman.get_question())
 
-for q in Statistics().get_overall_stats():
-    print(q)
+# Statistics.create_answer_stats({"id": 4,
+#                                 "quiz_format": 1,
+#                                 "status": "incorrect",
+#                                 "time": 50})
+
+for t in Statistics().get_overall_stats():
+    print(t)

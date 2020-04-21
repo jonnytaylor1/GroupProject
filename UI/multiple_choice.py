@@ -37,7 +37,7 @@ class MultipleChoice(Frame):
                                  "q_id":self.q_id,
                                  "time": self.parent.diff,
                                  "answer": None})
-        Statistics.create_answer_stats({"id": self.q_id, "time": int(self.parent.diff * 10), "status": "skipped", "quiz_format": 1})
+        Statistics.create_answer_stats({"id": self.q_id, "time": int(self.parent.diff * 10), "status": "skipped", "quiz_format": "Multi-Choice"})
         # load next question
         self.load_questions()
 
@@ -85,14 +85,14 @@ class MultipleChoice(Frame):
 
     def early_restart(self):
         self.stats["total_time"] += self.parent.diff
-        Statistics.create_answer_stats({"id": self.q_id, "time": int(self.parent.diff * 10), "status": "abandoned", "quiz_format": 1})
+        Statistics.create_answer_stats({"id": self.q_id, "time": int(self.parent.diff * 10), "status": "abandoned", "quiz_format": "Multi-choice"})
         self.show()
 
     # record as skipped question when you end quiz prematurely
     def end_quiz(self):
         self.grid_remove()
         self.stats["total_time"] += self.parent.diff
-        Statistics.increment_stats({"id": self.q_id, "time": int(self.parent.diff * 10), "abandons": 1, "quiz_format": 1})
+        Statistics.create_answer_stats({"id": self.q_id, "time": int(self.parent.diff * 10), "status": "abandoned", "quiz_format": "Multi-choice"})
         # show final statistics for the quiz
         self.parent.pages["EndScreen"].show(self.stats)
 
@@ -137,7 +137,7 @@ class MultipleChoice(Frame):
                                     "q_id": self.q_id,
                                     "time": self.parent.diff,
                                      "answer": button["text"]})
-            Statistics.create_answer_stats({"id": self.q_id, "time": int(self.parent.diff * 10), "status": "correct", "quiz_format": 1})
+            Statistics.create_answer_stats({"id": self.q_id, "time": int(self.parent.diff * 10), "status": "correct", "quiz_format": "Multi-Choice"})
 
         else:
             button["bg"] = "red"
@@ -146,7 +146,7 @@ class MultipleChoice(Frame):
                                     "q_id": self.q_id,
                                     "time": self.parent.diff,
                                      "answer": button["text"]})
-            Statistics.create_answer_stats({"id": self.q_id, "time": int(self.parent.diff * 10), "status": "incorrect", "quiz_format": 1})
+            Statistics.create_answer_stats({"id": self.q_id, "time": int(self.parent.diff * 10), "status": "incorrect", "quiz_format": "Multi-Choice"})
         for choice in self.choices:
             choice["state"] = DISABLED
         self.stats["total_time"] += self.parent.diff

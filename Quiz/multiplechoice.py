@@ -51,6 +51,7 @@ class Multiplechoice():
                 id = y.lastrowid
 
 
+
     def get_questions(self, random = False):
         if random:
             shuffle(self.qbank)
@@ -98,7 +99,7 @@ class Multiplechoice():
                             FROM questions
                             INNER JOIN packages
                             ON questions.package_id = packages.package_id
-                            WHERE packages.quiz_format = 'Quiz 1'
+                            WHERE packages.quiz_format = 'Multi-Choice'
                 '''):
                     print(row[0])
                     bank.append(

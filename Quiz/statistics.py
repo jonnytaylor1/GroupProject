@@ -14,7 +14,7 @@ class Statistics():
             CREATE TABLE IF NOT EXISTS statistics(
             id INTEGER PRIMARY KEY,
             question_id INTEGER,
-            quiz_format INTEGER,
+            quiz_format TEXT,
             corrects INTEGER,
             incorrects INTEGER,
             skips INTEGER,
@@ -28,7 +28,7 @@ class Statistics():
             CREATE TABLE IF NOT EXISTS answer_stats(
             id INTEGER PRIMARY KEY,
             question_id INTEGER,
-            quiz_format INTEGER,
+            quiz_format TEXT,
             status TEXT,
             time INTEGER,
             created_at TIMESTAMP,
@@ -168,7 +168,9 @@ class Statistics():
                 INNER JOIN packages
                 ON questions.package_id = packages.package_id)
                 ''')):
-                    self.q_bank.append(Question(row[-1] and row[-2] == int(row[-1][5]), *row[:12]))
+                    self.q_bank.append(Question(row[-1] == row[-2], *row[:-1]))
+                    print(row)
+
 
 
     def load_stats2(self):
@@ -195,7 +197,7 @@ class Statistics():
                 INNER JOIN packages
                 ON questions.package_id = packages.package_id)
                 ''')):
-                    self.q_bank.append(Question(row[-1] and row[-2] == int(row[-1][5]),*row[:-1]))
+                    self.q_bank.append(Question(row[-1] == row[-2],*row[:-1]))
 
     def get_overall_stats_old(self):
         self.load_stats()

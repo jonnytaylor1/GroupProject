@@ -44,7 +44,7 @@ data = [
 ]
 
 
-types = ["Quiz 1", None, None,  "Quiz 2"]
+types = ["Multi-Choice", None, None,  "Hangman"]
 counter = -1
 
 for package in data:

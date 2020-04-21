@@ -34,9 +34,9 @@ class PackageMenu(Frame):
 
             # Dropdown menu for quiz format
             format_selected = StringVar()
-            choices = ['None', 'Quiz 1','Quiz 2']
+            choices = ['None', 'Multi-Choice','Hangman']
             # Unpacks package info
-            if p["quiz_format"] == "Quiz 1" or "Quiz 2":
+            if p["quiz_format"] == "Multi-Choice" or "Hangman":
                 format_selected.set(p["quiz_format"])
             else:
                 format_selected.set("None")
@@ -59,11 +59,11 @@ class PackageMenu(Frame):
         Button(self.subFrame, text="Refresh", command=self.refresh).grid(row=row + 3, column=3)
 
 # Updates the table with the format selected for the package (error handling: quiz format is unique and so only one package
-# can be "Quiz 1" and one package can be "Quiz 2", all other packages quiz format are set to null in the table
+# can be "Multi-Choice" and one package can be "Hangman", all other packages quiz format are set to null in the table
 
     def assign_format(self, package_id, value):
         package_id, name, quiz_format = Package.get_package(package_id)
-        if value == "Quiz 1" or value == "Quiz 2":
+        if value == "Multi-Choice" or value == "Hangman":
             try:
                 Package.save_package(package_id, name, value)
             except sqlite3.IntegrityError:
@@ -107,7 +107,9 @@ class PackageMenu(Frame):
 
 # Deletes the package
     def del_p(self, i):
-        Package.delete_package(i)
+        confirmMessage = messagebox.askquestion ('Delete Package','Are you sure you want to delete this package, all questions inside the package will also be deleted',icon = 'warning')
+        if confirmMessage == "yes":
+            Package.delete_package(i)
         self.refresh()
 
 # Allows the user to edit an existing package

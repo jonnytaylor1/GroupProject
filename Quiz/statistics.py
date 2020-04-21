@@ -172,7 +172,6 @@ class Statistics():
                     print(row)
 
 
-
     def load_stats2(self):
         Question = namedtuple("Question",
                               ["currently_assigned", "q_id", "text", "correct", "in1", "in2", "in3", "time", "status", "created_at", "quiz", "package_id"])
@@ -198,6 +197,7 @@ class Statistics():
                 ON questions.package_id = packages.package_id)
                 ''')):
                     self.q_bank.append(Question(row[-1] == row[-2],*row[:-1]))
+
 
     def get_overall_stats_old(self):
         self.load_stats()

@@ -61,13 +61,13 @@ class Statistics():
     def create_stats(id):
         with Connection() as con:
             with con:
-                for format in range(1,3):
+                for format in ["Multi-Choice", "Hangman"]:
                     con.execute('''
                     INSERT INTO statistics
                     (question_id, quiz_format, corrects, incorrects, skips, abandons, time)
                     VALUES
                     (?, ?, 0, 0, 0, 0, 0)
-                    ''', (id, str(format)))
+                    ''', (id, format))
 
     # returns stats for a question id
     # time is represented by 10^(-1) seconds
@@ -168,8 +168,9 @@ class Statistics():
                 INNER JOIN packages
                 ON questions.package_id = packages.package_id)
                 ''')):
-                    self.q_bank.append(Question(row[-1] == row[-2], *row[:-1]))
-                    print(row)
+                    q = Question(row[-1] == row[-2], *row[:-1])
+                    self.q_bank.append(q)
+                    print(q)
 
 
     def load_stats2(self):

@@ -165,4 +165,4 @@ class Statistics(Frame):
 
     def back(self):
         self.grid_forget()
-        self.parent.pages["Welcome"].grid()
+        self.parent.pages["Welcome"].show()

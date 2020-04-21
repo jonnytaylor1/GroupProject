@@ -38,7 +38,7 @@ class Hangman(Frame):
 
     def go_to_welcome(self):
         self.grid_forget()
-        self.parent.pages["Welcome"].grid()
+        self.parent.pages["Welcome"].show()
 
 
 

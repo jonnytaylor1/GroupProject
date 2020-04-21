@@ -99,7 +99,7 @@ class PackageMenu(Frame):
 # Goes back to the main menu
     def go_menu(self):
         self.grid_forget()
-        self.parent.pages["Welcome"].grid()
+        self.parent.pages["Welcome"].show()
 
     def refresh(self):
         self.subFrame.destroy()

@@ -45,9 +45,6 @@ class Settings(Frame):
         # left for debugging purposes
         Button(self.subFrame, text = "Refresh", command = self.refresh).grid(row = row + 3, column = 3)
 
-        # scrollbar.config(command = )
-
-        # listbox = Listbox(self.subFrame, yscrollcommand = scrollbar.set)
 
 
 
@@ -77,7 +74,9 @@ class Settings(Frame):
 
     # delete a question in the database
     def del_q(self, i):
-        Multiplechoice.delete_question(i)
+        confirmMessage = messagebox.askquestion ('Delete Question','Are you sure you want to delete this question?',icon = 'warning')
+        if confirmMessage == "yes":
+            Multiplechoice.delete_question(i)
         self.refresh()
 
 

@@ -1,6 +1,7 @@
 from data.connection import Connection
 from collections import namedtuple
 import datetime
+from functools import reduce
 
 class Statistics():
     def __init__(self):
@@ -175,7 +176,7 @@ class Statistics():
 
     def load_stats2(self):
         Question = namedtuple("Question",
-                              ["currently_assigned", "q_id", "text", "correct", "in1", "in2", "in3", "time", "status", "created_at", "quiz", "package_id"])
+                              ["currently_assigned", "q_id", "text", "correct", "in1", "in2", "in3", "time", "status", "created_at", "package_id", "quiz" ])
         with Connection() as con:
             with con:
                 for i, row in enumerate(con.execute('''
@@ -206,4 +207,15 @@ class Statistics():
 
     def get_overall_stats(self):
         self.load_stats2()
-        return self.q_bank
+        Question = namedtuple("Question",
+                              ["currently_assigned", "q_id", "text", "correct", "in1", "in2", "in3", "times", "status",
+                               "created_at", "quiz", "package_id"])
+        def data_reducer(acc, q):
+            for y in acc:
+                if(q.q_id == y.q_id and q.quiz == y.quiz):
+                    y.times.append(q.time)
+                    return acc
+            acc.append(Question(*q[:7], [q.time], *q[8:]))
+            return acc
+
+        return reduce(data_reducer, self.q_bank, [])

@@ -168,7 +168,7 @@ class Statistics():
                 INNER JOIN packages
                 ON questions.package_id = packages.package_id)
                 ''')):
-                    self.q_bank.append(Question(row[-1] and row[-2] == int(row[-1][5]), *row[:12]))
+                    self.q_bank.append(Question(True, *row[:12]))
 
 
     def load_stats2(self):
@@ -195,7 +195,7 @@ class Statistics():
                 INNER JOIN packages
                 ON questions.package_id = packages.package_id)
                 ''')):
-                    self.q_bank.append(Question(row[-1] and row[-2] == int(row[-1][5]),*row[:-1]))
+                    self.q_bank.append(Question(True,*row[:-1]))
 
     def get_overall_stats_old(self):
         self.load_stats()

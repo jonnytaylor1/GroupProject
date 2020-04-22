@@ -36,6 +36,13 @@ class MainUI():
         # Updates the clock every 100 ms
         self.root.after(100, self.update_clock)
 
+
+    def update_window_size(self, frame):
+        self.root.update()
+        height = frame.winfo_reqheight()
+        width = frame.winfo_reqwidth()
+        self.root.geometry(f'{width + 20}x{height}')
+
     def run(self):
         self.curr_window.grid()
         self.root.mainloop()

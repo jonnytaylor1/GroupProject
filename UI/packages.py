@@ -146,6 +146,7 @@ class PackageMenu(Frame):
         except:
             pass
         self.list_packages()
+        self.parent.update_window_size(self)
 
 # Deletes the package
     def del_p(self, i):

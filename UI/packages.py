@@ -9,24 +9,27 @@ class PackageMenu(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent.root)
         self.parent = parent
-        self.list_packages()
+        self.scrollbar = Scrollbar(self.parent.root, orient="vertical")
+        self.scrollbar.grid_forget()
+        # self.list_packages()
 
     def list_packages(self):
         h_row = 1
         h_font = ("MS", 10, "bold")
         self.subFrame = Frame(self)
         self.subFrame.grid()
+        Label(self.subFrame).grid(row=h_row, column=1)
         Label(self.subFrame, text="Package Name", font = h_font).grid(row=h_row, column=2, sticky=W)
+        self.subFrame.grid_columnconfigure(3, weight = 4)
         Label(self.subFrame, text="Quiz Format", font = h_font).grid(row=h_row, column=3, sticky=W)
-        self.canvas = Canvas(self.subFrame, width=600, height = 200, scrollregion=(0,0, 500, 190))
+
+
+        self.canvas = Canvas(self.subFrame, width=600, height = 430, scrollregion=(0,0, 500, 200))
         self.windowFrame = Frame(self.canvas)
-
-
-        self.scrollbar = Scrollbar(self.subFrame, orient = "vertical", command = self.canvas.yview)
-        self.scrollbar.grid(row=h_row + 1, column=22, sticky="nsew")
+        self.scrollbar["command"] = self.canvas.yview
         self.canvas["yscrollcommand"] = self.scrollbar.set
         self.canvas.create_window((0, 0), window=self.windowFrame, anchor = NW)
-        self.canvas.grid(row=h_row + 1, column=2, columnspan = 20)
+        self.canvas.grid(row=2, column=2, columnspan = 3)
         row = 1
         self.rows = []
         for i, p in enumerate(Package().package_bank):
@@ -51,27 +54,20 @@ class PackageMenu(Frame):
             # When the dropdown menu is selected the command method is triggered
             format_dropdown = OptionMenu(self.windowFrame, format_selected, *choices, command=lambda value=format_selected.get(), package_id = p["package_id"]: self.assign_format(package_id, value))
             format_dropdown.grid(row=row, column=4)
-            Button(self.windowFrame, text="Delete", command=lambda package_id=p["package_id"]: self.del_p(package_id)).grid(row=row, column=10)
-            self.rows.append([l_name])
+            b_del = Button(self.windowFrame, text="Delete", command=lambda package_id=p["package_id"]: self.del_p(package_id))
+            b_del.grid(row=row, column=10)
+            self.rows.append([l_name, format_dropdown, b_edit, b_edit_questions, b_del])
 
 
         self.check_window_size()
 
         self.add_new_package_b = Button(self.subFrame, text="Add new Package", command=lambda: self.create_p_form(row + 1))
-        self.add_new_package_b.grid(row = row + 1, column = 3)
-        Button(self.subFrame, text="Back - Main Menu", command = self.go_menu).grid(row=row + 2, column=3)
-
-
-        # self.scrollbar.grid_forget()
-
-
-        # self.canvas["yscrollcommand"] = self.scrollbar.set
-
-
-
+        self.add_new_package_b.grid(row = 4, column = 2, sticky = SW)
+        Button(self.subFrame, text="Back - Main Menu", command = self.go_menu).grid(row=4, column=3, sticky = S)
 
         # left for debugging purposes
-        Button(self.subFrame, text="Refresh", command=self.refresh).grid(row=row + 3, column=3)
+        Button(self.subFrame, text="Refresh", command=self.refresh).grid(row=4, column=4, sticky = SE)
+
 
 
 
@@ -80,12 +76,12 @@ class PackageMenu(Frame):
         w_height = self.windowFrame.winfo_reqheight()
         w_width = self.windowFrame.winfo_reqwidth()
         if (w_height > 200):
-            self.scrollbar.grid()
+            self.scrollbar.grid(row = 0, column = 1, sticky = NSEW)
             self.canvas["scrollregion"] = (0, 0, 0, w_height)
-            self.canvas["height"] = 200
+            # self.canvas["height"] = 200
         else:
             self.scrollbar.grid_forget()
-            self.canvas["height"] = w_height
+            # self.canvas["height"] = w_height
         self.canvas["width"] = w_width
 
 
@@ -107,14 +103,21 @@ class PackageMenu(Frame):
 
 # Creates an entry so that the user can save a new package
     def create_p_form(self, new_row):
-        self.add_new_package_b.destroy()
+        # self.add_new_package_b.destroy()
+        self.refresh()
 
-        self.package_name = Entry(self.windowFrame)
-        self.package_name.grid(row = new_row, column = 2)
 
-        self.b = Button(self.windowFrame, text = "Save", font = ("MS", 8, "bold"))
-        self.b.grid(row = new_row, column = 3)
+        Label(self.subFrame, text = "New Package Name").grid(row = 3, column = 2, sticky = E)
+
+        self.package_name = Entry(self.subFrame)
+        self.package_name.grid(row = 3, column = 3, sticky = W)
+
+        self.b = Button(self.subFrame, text = "Create", font = ("MS", 8, "bold"))
+        self.b.grid(row = 3, column = 4, sticky = W)
         self.b["command"] = self.send_p_data
+
+        self.parent.root.update()
+        self.canvas["height"] = int(self.canvas["height"]) - self.package_name.winfo_height() - 5
 
         self.check_window_size()
 
@@ -134,10 +137,14 @@ class PackageMenu(Frame):
 # Goes back to the main menu
     def go_menu(self):
         self.grid_forget()
+        self.scrollbar.grid_forget()
         self.parent.pages["Welcome"].show()
 
     def refresh(self):
-        self.subFrame.destroy()
+        try:
+            self.subFrame.destroy()
+        except:
+            pass
         self.list_packages()
 
 # Deletes the package
@@ -149,12 +156,15 @@ class PackageMenu(Frame):
 
 # Allows the user to edit an existing package
     def edit_p(self, row, package_id):
-        for label in self.rows[row - 2]:
-            label.grid_remove()
-        self.create_p_form(row)
+        self.refresh()
+        for row_els in self.rows:
+            row_els[1].configure(state="disabled")
+            [el.grid_forget() for el in row_els[2:]]
+        self.package_name = Entry(self.windowFrame)
+        self.package_name.grid(row = row, column = 2)
         package_id, name, quiz_format = Package.get_package(package_id)
         self.package_name.insert(END, name)
-        self.b["command"] = lambda: self.save_p(package_id)
+        Button(self.windowFrame, text="Save", command = lambda: self.save_p(package_id)).grid(row = row, column = 5)
 
 # Updates the package records (error handling: ensures that the package name is unique and is not empty)
     def save_p(self, package_id):
@@ -173,5 +183,11 @@ class PackageMenu(Frame):
 # Will eventually go to the packages questions
     def go_to_package_questions(self, package_id):
         self.grid_forget()
+        self.scrollbar.grid_forget()
         self.parent.pages["Settings"].show(package_id)
+
+    def show(self):
+        self.grid(column=0, row=0, sticky=NSEW)
+        self.refresh()
+
 

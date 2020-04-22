@@ -69,7 +69,7 @@ class Welcome(Frame):
     # Go to package page
     def go_to_packages(self):
         self.grid_forget()
-        self.parent.pages["PackageMenu"].grid()
+        self.parent.pages["PackageMenu"].show()
 
     def go_to_statistics(self):
         self.grid_forget()

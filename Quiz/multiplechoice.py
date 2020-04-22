@@ -72,7 +72,7 @@ class Multiplechoice():
     def get_question(id):
         with Connection() as con:
             with con:
-                return con.execute("SELECT id, question, correct, incorrect1, incorrect2, incorrect3 from questions WHERE id = ?", str(id)).fetchone()
+                return con.execute("SELECT id, question, correct, incorrect1, incorrect2, incorrect3 from questions WHERE id = ?", (str(id),)).fetchone()
 
 
 

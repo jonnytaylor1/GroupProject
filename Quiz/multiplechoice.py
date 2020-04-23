@@ -4,11 +4,39 @@ from Quiz.statistics import Statistics
 
 # Creates a backend model of the questions for the multiple choice quiz
 class Multiplechoice():
-    def __init__(self, package_id = None):
+    def __init__(self, package_id = None, new_way = False):
         self.qbank = []
         self.ensure_table_exists()
-        self.load_questions(package_id)
+        if new_way:
+            self.load_questions2(package_id)
+        else:
+            self.load_questions(package_id)
         Statistics()
+
+    # J Had to include package_id when unpacking in load questions so that it still works (and should be useful later as well)
+
+    def load_questions2(self, package_id):
+        if package_id:
+            with Connection() as con:
+                with con:
+                    for row in con.execute('''
+                                SELECT
+                                id,
+                                question,
+                                correct,
+                                incorrect1,
+                                incorrect2,
+                                incorrect3
+                                FROM questions
+                                WHERE package_id = ?
+                    ''', (str(package_id),)):
+                        print(row[0])
+                        self.qbank.append({"id": row[0], "text": row[1], "correct": row[2],
+                                           "in1": row[3], "in2": row[4], "in3": row[5]})
+        else:
+            with Connection() as con:
+                for id, question_text, correct, b, c, d, package_id in con.execute("SELECT * from questions"):
+                    self.qbank.append({"text": question_text, "correct": correct, "incorrect": [b, c, d], "id": id})
 
 
 #J Had to include package_id when unpacking in load questions so that it still works (and should be useful later as well)

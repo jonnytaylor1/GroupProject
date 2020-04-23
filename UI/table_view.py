@@ -2,10 +2,10 @@ from tkinter import *
 
 
 class TableView(Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, root):
         Frame.__init__(self, parent)
         self.parent = parent
-        self.root = parent.parent.root
+        self.root = root
         self.scrollbar = Scrollbar(self.root, orient="vertical")
         self.scrollbar.grid_forget()
         self.columns = 0
@@ -35,7 +35,7 @@ class TableView(Frame):
         self._curr_cell = self.matrix[row][column]
         return self
 
-    def get_cell(self, * row, column):
+    def get_cell(self, *, row, column):
         return self.matrix[row][column]
 
     def set_cell(self, *, row, column, func):
@@ -59,7 +59,7 @@ class TableView(Frame):
             dis_row = []
             self.matrix.append(dis_row)
             for i, prop in enumerate(self.prop_names):
-                tkinter_obj = self.cell_constructors[i](self.windowFrame, row["id"])
+                tkinter_obj = self.cell_constructors[i](self.windowFrame, row_i)
                 c = Cell(tkinter_obj, column=i, row=row_i)
                 try:
                     c.contents["text"] = row[prop]
@@ -81,11 +81,13 @@ class TableView(Frame):
     def check_window_size(self):
         self.root.update()
         w_height = self.windowFrame.winfo_reqheight()
+        w_width = self.windowFrame.winfo_reqwidth()
         if (w_height > 200):
             self.scrollbar.grid(row=0, column=1, sticky=NSEW)
             self.canvas["scrollregion"] = (0, 0, 0, w_height)
         else:
             self.scrollbar.grid_forget()
+        self.canvas["width"] = w_width
 
     def refresh(self):
         self.update_column_width()

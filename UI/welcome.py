@@ -1,4 +1,6 @@
 from tkinter import *
+from UI import *
+
 # This is a start page for the program
 
 
@@ -50,6 +52,11 @@ class Welcome(Frame):
         self.bind_hover(b4)
         b4.grid(row=4, column=0, sticky=N+S+E+W)
 
+
+        b5 = Button(self, text="Test", command=self.go_to_test)
+        b5.grid(row=5, column=0, sticky=N+S+E+W)
+        self.bind_hover(b5)
+
     # Bind Hover
     @staticmethod
     def bind_hover(element):
@@ -78,3 +85,7 @@ class Welcome(Frame):
     def go_to_hangman(self):
         self.grid_forget()
         self.parent.pages["Hangman"].grid()
+
+    def go_to_test(self):
+        self.grid_forget()
+        self.parent.pages["Test"].show()

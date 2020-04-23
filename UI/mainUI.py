@@ -15,13 +15,15 @@ class MainUI():
         self.timer = StringVar()
         self.clock1 = time.time()
         # specify here which page you would like to add
+
         self.pages = {"Welcome": Welcome(self),
                       "Settings": Settings(self),
                       "MultipleChoice": MultipleChoice(self),
                       "PackageMenu": PackageMenu(self),
                       "EndScreen": EndScreen(self),
                       "Statistics": Statistics(self),
-                      "Hangman": Hangman(self)}
+                      "Hangman": Hangman(self),
+                      "Test": Test(self)}
 
         # this is the first page to show
         self.curr_window = self.pages["Welcome"]

@@ -92,9 +92,9 @@ class PackageMenu(Frame):
         self.formFrame.grid(row=0, column=1)
 
 
-        Label(self.formFrame, text = "New Package Name").grid(row = 0, column = 0, sticky = E)
+        # Label(self.formFrame, text = "New Package Name").grid(row = 0, column = 0, sticky = E)
 
-        self.package_name = Entry(self.formFrame)
+        self.package_name = BetterEntry(self.formFrame, bgText="Enter Package Name")
         self.package_name.grid(row = 0, column = 1, sticky = W)
 
         self.add_new_package_b["command"] = self.send_p_data
@@ -104,7 +104,7 @@ class PackageMenu(Frame):
 
 # Adds the new package to the database (Error handling: ensures that the package name is unique and is not blank)
     def send_p_data(self):
-        if self.package_name.get() == "":
+        if self.package_name.get() == "" or self.package_name.placeholder:
             messagebox.showinfo("Alert", "Blank package name has not been saved. You must enter a package name before saving")
         else:
             try:

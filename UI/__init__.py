@@ -1,6 +1,7 @@
 # include pages that you would like to import from this folder
 
 from .table_view import TableView
+from .betterEntry import BetterEntry, BetterText
 from .multiple_choice import MultipleChoice, EndScreen
 from .settings import Settings
 from .welcome import Welcome

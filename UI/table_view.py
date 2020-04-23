@@ -48,8 +48,6 @@ class TableView(Frame):
         self.matrix[row][column].contents = func(self.windowFrame)
         self.refresh()
 
-
-
     @property
     def data(self):
         return self._data
@@ -98,7 +96,6 @@ class TableView(Frame):
     def refresh(self):
         self.update_column_width()
         self.check_window_size()
-
 
 class Cell:
     def __init__(self, contents, *, column=None, row=None):

@@ -40,72 +40,22 @@ class PackageMenu(Frame):
         )
 
         self.table.add_column(
-            h_constructor=lambda f: Label(f),
-            cell_constructor=lambda f, id: Button(f, text="Edit Package Name", command=lambda row_id=id: self.edit_p(row_id)),
-            property=""
+            cell_constructor=lambda f, id: Button(f, text="Edit Package Name", command=lambda row_id=id: self.edit_p(row_id))
         )
 
         self.table.add_column(
-            h_constructor=lambda f: Label(f),
-            cell_constructor=lambda f, id: Button(f, text="Edit Package Questions", command=lambda package_id = self.table.data[id]["package_id"]: self.go_to_package_questions(package_id) ),
-            property=""
+            cell_constructor=lambda f, id: Button(f, text="Edit Package Questions", command=lambda package_id = self.table.data[id]["package_id"]: self.go_to_package_questions(package_id) )
         )
 
         self.table.add_column(
-            h_constructor=lambda f: Label(f),
-            cell_constructor=lambda f, id: Button(f, text="Delete", command=lambda package_id=self.table.data[id]["package_id"]: self.del_p(package_id)),
-            property=""
+            cell_constructor=lambda f, id: Button(f, text="Delete", command=lambda package_id=self.table.data[id]["package_id"]: self.del_p(package_id))
         )
 
         self.table.data = Package().package_bank
 
 
-        # h_row = 1
-        # h_font = ("MS", 10, "bold")
-
-        # Label(self.subFrame).grid(row=h_row, column=1)
-        # Label(self.subFrame, text="Package Name", font = h_font).grid(row=h_row, column=2, sticky=W)
-        # self.subFrame.grid_columnconfigure(3, weight = 4)
-        # Label(self.subFrame, text="Quiz Format", font = h_font).grid(row=h_row, column=3, sticky=W)
-
-
-        # self.canvas = Canvas(self.subFrame, width=600, height = 430, scrollregion=(0,0, 500, 200))
-        # self.windowFrame = Frame(self.canvas)
-        # self.scrollbar["command"] = self.canvas.yview
-        # self.canvas["yscrollcommand"] = self.scrollbar.set
-        # self.canvas.create_window((0, 0), window=self.windowFrame, anchor = NW)
-        # self.canvas.grid(row=2, column=2, columnspan = 3)
-        # row = 1
-        # self.rows = []
-        # for i, p in enumerate(Package().package_bank):
-        #     row += 1
-        #     l_name = Label(self.windowFrame, text=p["name"])
-        #     l_name.grid(row=row, column=2)
-        #     b_edit = Button(self.windowFrame, text="Edit Package Name")
-        #     b_edit.grid(row=row, column=7)
-        #     b_edit["command"] = lambda row=row, package_id = p["package_id"]: self.edit_p(row, package_id)
-        #     b_edit_questions = Button(self.windowFrame, text="Edit Package Questions")
-        #     b_edit_questions.grid(row=row, column=8)
-        #     b_edit_questions["command"] = lambda package_id = p["package_id"]: self.go_to_package_questions(package_id)
-        #
-        #     # Dropdown menu for quiz format
-        #     format_selected = StringVar()
-        #     choices = ['None', 'Multi-Choice','Hangman']
-        #     # Unpacks package info
-        #     if p["quiz_format"] == "Multi-Choice" or "Hangman":
-        #         format_selected.set(p["quiz_format"])
-        #     else:
-        #         format_selected.set("None")
-        #     # When the dropdown menu is selected the command method is triggered
-        #     format_dropdown = OptionMenu(self.windowFrame, format_selected, *choices, command=lambda value=format_selected.get(), package_id = p["package_id"]: self.assign_format(package_id, value))
-        #     format_dropdown.grid(row=row, column=4)
-        #     b_del = Button(self.windowFrame, text="Delete", command=lambda package_id=p["package_id"]: self.del_p(package_id))
-        #     b_del.grid(row=row, column=10)
-        #     self.rows.append([l_name, format_dropdown, b_edit, b_edit_questions, b_del])
-
         self.footer = Frame(self.subFrame)
         self.footer.grid(row=1, column=0, sticky=NSEW)
-
 
         self.add_new_package_b = Button(self.footer, text="Add new Package", command=self.create_p_form)
         self.add_new_package_b.grid(row = 0, column = 2, sticky = E)
@@ -203,15 +153,6 @@ class PackageMenu(Frame):
                 self.table.get_cell(column=2 + i, row=row_i).hide()
 
         self.table.set_cell(row=row_id, column=2, func=lambda f: Button(f, text="Save", command=lambda: self.save_p(package_id)))
-
-        # for row_els in self.rows:
-        #     row_els[1].configure(state="disabled")
-        #     [el.grid_forget() for el in row_els[2:]]
-        # self.package_name = Entry(self.windowFrame)
-        # self.package_name.grid(row = row, column = 2)
-        # package_id, name, quiz_format = Package.get_package(package_id)
-        # self.package_name.insert(END, name)
-        # Button(self.windowFrame, text="Save", command = lambda: self.save_p(package_id)).grid(row = row, column = 5)
 
 # Updates the package records (error handling: ensures that the package name is unique and is not empty)
     def save_p(self, package_id):

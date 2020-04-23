@@ -19,38 +19,29 @@ class Settings(Frame):
 
         self.table.add_column(
             h_constructor=lambda f: Label(f, text="Question Prompt"),
-            cell_constructor=lambda f, id: Label(f),
             property="text"
         )
         self.table.add_column(
             h_constructor=lambda f: Label(f, text="Answer"),
-            cell_constructor=lambda f, id: Label(f),
             property="correct"
         )
         self.table.add_column(
             h_constructor=lambda f: Label(f, text="Incorrect choice 1"),
-            cell_constructor=lambda f, id: Label(f),
             property="in1"
         )
         self.table.add_column(
             h_constructor=lambda f: Label(f, text="Incorrect choice 2"),
-            cell_constructor=lambda f, id: Label(f),
             property="in2"
         )
         self.table.add_column(
             h_constructor=lambda f: Label(f, text="Incorrect choice 3"),
-            cell_constructor=lambda f, id: Label(f),
             property="in3"
         )
         self.table.add_column(
-            h_constructor=lambda f: Label(f),
-            cell_constructor=lambda f, id: Button(f, text="Edit", command=lambda id=id: self.edit_form(id)),
-            property=""
+            cell_constructor=lambda f, id: Button(f, text="Edit", command=lambda id=id: self.edit_form(id))
         )
         self.table.add_column(
-            h_constructor=lambda f: Label(f),
-            cell_constructor=lambda f, row: Button(f, text="Delete", command=lambda row=row: self.del_q(row)),
-            property=""
+            cell_constructor=lambda f, row: Button(f, text="Delete", command=lambda row=self.table.data[row]["id"]: self.del_q(row))
         )
 
         self.table.data = Multiplechoice(self.package_id, True).qbank

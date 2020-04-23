@@ -22,10 +22,16 @@ class TableView(Frame):
         self.cell_constructors = []
         self.matrix = []
 
-    def add_column(self, *, h_constructor, cell_constructor, property):
-        heading = h_constructor(self.headingsFrame)
-        self.cell_constructors.append(cell_constructor)
+    def add_column(self, *, h_constructor=None, cell_constructor=None, property=""):
+        try:
+            heading = h_constructor(self.headingsFrame)
+        except:
+            heading = Label(self.headingsFrame)
         self.headings.append(Cell(heading, row=0, column=self.columns))
+        if cell_constructor:
+            self.cell_constructors.append(cell_constructor)
+        else:
+            self.cell_constructors.append(lambda f, id: Label(f))
         self.prop_names.append(property)
         self.columns += 1
         self.refresh()

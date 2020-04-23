@@ -53,10 +53,6 @@ class Welcome(Frame):
         b4.grid(row=4, column=0, sticky=N+S+E+W)
 
 
-        b5 = Button(self, text="Test", command=self.go_to_test)
-        b5.grid(row=5, column=0, sticky=N+S+E+W)
-        self.bind_hover(b5)
-
     # Bind Hover
     @staticmethod
     def bind_hover(element):

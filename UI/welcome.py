@@ -47,8 +47,8 @@ class Welcome(Frame):
         b4 = HoverButton(self, text="Hangman", font=("MS", 8, "bold"),command=lambda x=self: x.go_to_hangman())
         b4.grid(row=4, column=0, sticky=N+S+E+W)
 
-        b5 = HoverButton(self, text="Test", command=self.go_to_test)
-        b5.grid(row=4, column=0, sticky=N+S+E+W)
+        # b5 = HoverButton(self, text="Test", command=self.go_to_test)
+        # b5.grid(row=4, column=0, sticky=N+S+E+W)
 
     # goes to  the Multiple choice page
 

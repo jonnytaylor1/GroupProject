@@ -29,7 +29,7 @@ class BetterEntry(Entry):
         if self.placeholder:
             return ""
         else:
-            return super()
+            return super().get()
 
 class BetterText(Text):
     def __init__(self, *args, bgText, **kwargs):
@@ -63,4 +63,4 @@ class BetterText(Text):
         if self.placeholder:
             return ""
         else:
-            super(*args)
+            super().get(*args)

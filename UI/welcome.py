@@ -29,40 +29,27 @@ class Welcome(Frame):
         label = Label(self, text="Welcome!", font=("MS", 15, "bold"))
         label.grid(row=0, column=0, sticky=N+S+E+W)
 
-        b1 = Button(self, text="Start", font = ("MS", 8, "bold"))
-        self.bind_hover(b1)
+        b1 = HoverButton(self, text="Start", font = ("MS", 8, "bold"))
         b1.grid(row=1, column=0, sticky=N+S+E+W)
 
         b1["command"] = self.start_quiz
 
         #J Goes to packages menu
 
-        b2 = Button(self, text="Packages Menu", font=("MS", 8, "bold"))
-        self.bind_hover(b2)
+        b2 = HoverButton(self, text="Packages Menu", font=("MS", 8, "bold"))
         b2.grid(row = 2, column=0, sticky=N+S+E+W)
-
         b2["command"] = self.go_to_packages
 
-        b3 = Button(self, text="Statistics", font=("MS", 8, "bold"))
-        self.bind_hover(b3)
+        b3 = HoverButton(self, text="Statistics", font=("MS", 8, "bold"))
         b3.grid(row=3, column=0, sticky=N+S+E+W)
         b3["command"] = self.go_to_statistics
 
-        b4 = Button(self, text="Hangman", font=("MS", 8, "bold"),command=lambda x=self: x.go_to_hangman())
-        self.bind_hover(b4)
+        b4 = HoverButton(self, text="Hangman", font=("MS", 8, "bold"),command=lambda x=self: x.go_to_hangman())
         b4.grid(row=4, column=0, sticky=N+S+E+W)
 
+        b5 = HoverButton(self, text="Test", command=self.go_to_test)
+        b5.grid(row=4, column=0, sticky=N+S+E+W)
 
-    # Bind Hover
-    @staticmethod
-    def bind_hover(element):
-        """
-
-        :param element: Button element on which the hover is applied
-        :return:
-       """
-        element.bind("<Enter>", lambda event, h=element: h.configure(bg="#a6a6a6", fg="#ffffff"))
-        element.bind("<Leave>", lambda event, h=element: h.configure(bg="#e8e6e6", fg="#000000"))
     # goes to  the Multiple choice page
 
     def start_quiz(self):

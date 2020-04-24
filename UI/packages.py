@@ -40,15 +40,15 @@ class PackageMenu(Frame):
         )
 
         self.table.add_column(
-            cell_constructor=lambda f, id: Button(f, text="Edit Package Name", command=lambda row_id=id: self.edit_p(row_id))
+            cell_constructor=lambda f, id: HoverButton(f, text="Edit Package Name", command=lambda row_id=id: self.edit_p(row_id))
         )
 
         self.table.add_column(
-            cell_constructor=lambda f, id: Button(f, text="Edit Package Questions", command=lambda package_id = self.table.data[id]["package_id"]: self.go_to_package_questions(package_id) )
+            cell_constructor=lambda f, id: HoverButton(f, text="Edit Package Questions", command=lambda package_id = self.table.data[id]["package_id"]: self.go_to_package_questions(package_id) )
         )
 
         self.table.add_column(
-            cell_constructor=lambda f, id: Button(f, text="Delete", command=lambda package_id=self.table.data[id]["package_id"]: self.del_p(package_id))
+            cell_constructor=lambda f, id: HoverButton(f, text="Delete", command=lambda package_id=self.table.data[id]["package_id"]: self.del_p(package_id))
         )
 
         self.table.data = Package().package_bank
@@ -57,9 +57,9 @@ class PackageMenu(Frame):
         self.footer = Frame(self.subFrame)
         self.footer.grid(row=1, column=0, sticky=NSEW)
 
-        self.add_new_package_b = Button(self.footer, text="Add new Package", command=self.create_p_form)
+        self.add_new_package_b = HoverButton(self.footer, text="Add new Package", command=self.create_p_form)
         self.add_new_package_b.grid(row = 0, column = 2, sticky = E)
-        Button(self.footer, text="Back - Main Menu", command = self.go_menu).grid(row=0, column=0, sticky = W)
+        HoverButton(self.footer, text="Back - Main Menu", command = self.go_menu).grid(row=0, column=0, sticky = W)
         self.footer.grid_columnconfigure(1, weight=2)
 
         # left for debugging purposes

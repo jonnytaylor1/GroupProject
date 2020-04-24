@@ -11,6 +11,9 @@ class Test(Frame):
 
     def show(self):
         self.grid()
-        BetterText(self, bgText="Enter here").grid()
-        BetterText(self, bgText="Or here").grid()
+        self.hb = HoverButton(self, text="click me", command=self.click)
+        self.hb.grid()
 
+    def click(self):
+        self.hb["state"] = DISABLED
+        self.hb["bg"] = "green"

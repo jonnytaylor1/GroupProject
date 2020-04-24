@@ -3,6 +3,7 @@ import time
 import tkinter.messagebox
 from Quiz.multiplechoice import Multiplechoice
 from Quiz.statistics import Statistics
+from UI import *
 
 
 class MultipleChoice(Frame):
@@ -41,21 +42,6 @@ class MultipleChoice(Frame):
         # load next question
         self.load_questions()
 
-    @staticmethod
-    def bind_hover(element, bind=True):
-        """
-
-        :param element: Button element on which the hover is applied
-        :param bind: argument that decides whether the hover is to be added or removed
-        :return:
-        """
-        if bind:
-            element.bind("<Enter>", lambda event, h=element: h.configure(bg="#a6a6a6", fg="#ffffff"))  # Add the color of the background and font
-            element.bind("<Leave>", lambda event, h=element: h.configure(bg="#e8e6e6", fg="#000000"))
-        else:
-            element.unbind("<Enter>")
-            element.unbind("<Leave>")
-
     # create question form for the multiple choice
     def create_questions(self):
         for rows in range(8):
@@ -72,14 +58,14 @@ class MultipleChoice(Frame):
         self.timer = Label(self, textvariable=self.parent.timer)
         self.timer.grid(row=2, column=1, sticky=N+S+E+W)
         self.choices = []
-        self.b_next = Button(self, text="Skip", command=self.skip_q)
+        self.b_next = HoverButton(self, text="Skip", command=self.skip_q)
         self.b_next.grid(row=3, column=0, sticky=N+S+E+W)
-        self.b_restart = Button(self, text="Restart", command=self.show)
+        self.b_restart = HoverButton(self, text="Restart", command=self.show)
         self.b_restart.grid(row=3, column=1, sticky=N+S+E+W)
-        self.b_end = Button(self, text="End Quiz", command=self.end_quiz)
+        self.b_end = HoverButton(self, text="End Quiz", command=self.end_quiz)
         self.b_end.grid(row=3, column=2, sticky=N+S+E+W)
         for i, answer in enumerate(list("abcd")):
-            b = Button(self, text=answer, font=("MS", 8, "bold"))
+            b = HoverButton(self, text=answer, font=("MS", 8, "bold"))
             b.grid(row=4+i, column=0, columnspan=3, sticky=N+S+E+W)
             self.choices.append(b)
 
@@ -103,7 +89,6 @@ class MultipleChoice(Frame):
             for choice in self.choices:
                 choice["bg"] = "#e8e6e6"
                 choice["fg"] = "#000000"
-                self.bind_hover(choice)
                 choice["state"] = NORMAL
             self.b_next["command"] = self.skip_q
             self.b_next["text"] = "Skip"
@@ -129,7 +114,6 @@ class MultipleChoice(Frame):
         for choice in self.choices:
             # lock ability to choose another answer
             choice["state"] = DISABLED
-            self.bind_hover(choice,bind=False)
         if button["text"] == correct:
             button["bg"] = "green"
             self.stats["correct_qs"] += 1
@@ -147,8 +131,6 @@ class MultipleChoice(Frame):
                                     "time": self.parent.diff,
                                      "answer": button["text"]})
             Statistics.create_answer_stats({"id": self.q_id, "time": int(self.parent.diff * 10), "status": "incorrect", "quiz_format": "Multi-Choice"})
-        for choice in self.choices:
-            choice["state"] = DISABLED
         self.stats["total_time"] += self.parent.diff
         self.timer.grid_remove()
         self.l_timer.grid_remove()

@@ -38,10 +38,10 @@ class Settings(Frame):
             property="in3"
         )
         self.table.add_column(
-            cell_constructor=lambda f, row: Button(f, text="Edit", command=lambda row=row: self.edit_form(row))
+            cell_constructor=lambda f, row: HoverButton(f, text="Edit", command=lambda row=row: self.edit_form(row))
         )
         self.table.add_column(
-            cell_constructor=lambda f, row: Button(f, text="Delete", command=lambda row=row: self.del_q(row))
+            cell_constructor=lambda f, row: HoverButton(f, text="Delete", command=lambda row=row: self.del_q(row))
         )
 
         self.table.data = Multiplechoice(self.package_id, True).qbank
@@ -49,9 +49,9 @@ class Settings(Frame):
         self.footer = Frame(self.subFrame)
         self.footer.grid(row=1, column=0, sticky=NSEW)
 
-        Button(self.footer, text="Back - Package Menu", command=self.go_package_menu).grid(row=0, column=0, sticky=W)
+        HoverButton(self.footer, text="Back - Package Menu", command=self.go_package_menu).grid(row=0, column=0, sticky=W)
         self.footer.grid_columnconfigure(2, weight=2)
-        self.b_add = Button(self.footer, text="Add new Question", command=self.new_q_form)
+        self.b_add = HoverButton(self.footer, text="Add new Question", command=self.new_q_form)
         self.b_add.grid(row=0, column=2, sticky=E)
 
 
@@ -120,7 +120,7 @@ class Settings(Frame):
             else:
                 for row in range(len(self.table.data)):
                     self.table.get_cell(row=row, column=i).hide()
-        self.table.set_cell(row=row_id, column=5, func=lambda f: Button(f, text="Save", command=self.save_q))
+        self.table.set_cell(row=row_id, column=5, func=lambda f: HoverButton(f, text="Save", command=self.save_q))
 
 
         self.question["id"], text, correct, inc1, inc2, inc3 = Multiplechoice.get_question(self.table.data[row_id]["id"])

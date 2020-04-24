@@ -17,3 +17,4 @@ class Test(Frame):
     def click(self):
         self.hb["state"] = DISABLED
         self.hb["bg"] = "green"
+        print(ttk.Widget.__subclasses__())

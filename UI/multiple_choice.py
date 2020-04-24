@@ -219,5 +219,5 @@ class EndScreen(Frame):
 
 
 
-        Button(self, text="Menu", command=self.go_menu).grid(row=5, column=0, sticky=N+S+E+W)
-        Button(self, text="Restart", command=self.restart).grid(row=5, column=1, sticky=N+S+E+W)
+        HoverButton(self, text="Menu", command=self.go_menu).grid(row=5, column=0, sticky=N+S+E+W)
+        HoverButton(self, text="Restart", command=self.restart).grid(row=5, column=1, sticky=N+S+E+W)

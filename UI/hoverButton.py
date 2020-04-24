@@ -1,13 +1,20 @@
 from tkinter import *
 
 class HoverButton(Button):
-    def __init__(self, *args, bg="#e8e6e6", fg="#000000", bg_hover="#a6a6a6", fg_hover="#ffffff", **kwargs):
+    def __init__(self, *args, bg="#e8e6e6", fg="#000000", bg_hover="#a6a6a6", fg_hover="#ffffff",
+                 row=None, column=None, sticky=None, pos=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.bg = bg
         self.fg = fg
         self.bg_hover = bg_hover
         self.fg_hover = fg_hover
         self.add_hover_effect()
+        if pos:
+            try: sticky = pos[2]
+            except: pass
+            self.grid(row=pos[0], column=pos[1], sticky=sticky)
+        else:
+            self.grid(row=row, column=column, sticky=sticky)
 
     # applies event listeners to check for mouse entering and exiting the bounds of the button
     def add_hover_effect(self):

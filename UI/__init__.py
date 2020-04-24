@@ -3,6 +3,7 @@
 from .table_view import TableView
 from .betterEntry import BetterEntry, BetterText
 from .hoverButton import HoverButton
+from .usefulLabel import GridLabel
 from .multiple_choice import MultipleChoice, EndScreen
 from .settings import Settings
 from .welcome import Welcome

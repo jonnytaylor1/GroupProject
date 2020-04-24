@@ -19,8 +19,12 @@ class PackageMenu(Page):
             format_selected = StringVar()
             choices = ['None', 'Multi-Choice', 'Hangman']
             format_selected.set(self.table.data[row_id]["quiz_format"])
-            format_selector = OptionMenu(f, format_selected, *choices, command=lambda value=format_selected.get(), package_id = self.table.data[row_id]["package_id"]: self.assign_format(package_id, value))
-            # format_selector["command"] = lambda value=format_selected.get(), package_id = self.table.data[row_id]["package_id"]: self.assign_format(package_id, value)
+            format_selector = OptionMenu(f, format_selected, *choices, command=lambda value=format_selected.get(),
+                package_id = self.table.data[row_id]["package_id"]: self.assign_format(package_id, value))
+            format_selector.configure(bg="#e8e6e6")
+            format_selector.configure(fg="#000000")
+            format_selector.configure(activebackground="#a6a6a6")
+            format_selector.configure(activeforeground="#ffffff")
             return format_selector
         self.table.add_column(title="Quiz Format", cell_constructor=drop_constructor, property="quiz_format")
         self.table.add_column(

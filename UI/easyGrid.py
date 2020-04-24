@@ -1,5 +1,6 @@
-from tkinter import *
-
+# Add the easy grid as as the first (left-most) inherited class for your tkinter widget to make grid positioning easy.
+# Either use your usual keywords (eg. column, row) when creating a widget or use pos keyword to pass a tuple
+# (row, column, sticky) eg. (1, 2, E) will position the widget on row 1, column 2 with sticky E
 class EasyGrid:
     def __init__(self, *args, row=None, column=None, sticky=None, pos=None, cspan=None, rspan=None, **kwargs):
         super().__init__(*args, **kwargs)

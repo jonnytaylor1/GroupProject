@@ -18,8 +18,6 @@ class MainUI():
         Grid.rowconfigure(self.root, 0, weight=1)
         Grid.columnconfigure(self.root, 0, weight=1)
 
-
-
         self.curr_page = None
         self.prev_page = None
 

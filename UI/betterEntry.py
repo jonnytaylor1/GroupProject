@@ -7,9 +7,7 @@ class BetterEntry(Entry):
         self.insert(END, self.bgText)
         self.bind("<FocusIn>", self.on_focus_in)
         self.bind("<ButtonRelease-1>", self.on_focus_in)
-        self.bind("<FocusOut>", self.on_focus_out)
         self.bind("<KeyRelease>", self.on_typing)
-        self.bind("<KeyRelease-BackSpace>", self.on_focus_out)
         self.placeholder = True
 
     def on_focus_in(self, e):
@@ -21,13 +19,17 @@ class BetterEntry(Entry):
             self.delete(self.index(INSERT), END)
             self["fg"] = "black"
             self.placeholder = False
-
-    def on_focus_out(self, e):
-        if not len(self.get()) > 0:
+        elif not len(self.get()) > 0:
             self.insert(END, self.bgText)
             self["fg"] = "grey"
             self.placeholder = True
             self.icursor(0)
+
+    def get(self):
+        if self.placeholder:
+            return ""
+        else:
+            return super()
 
 class BetterText(Text):
     def __init__(self, *args, bgText, **kwargs):
@@ -36,25 +38,29 @@ class BetterText(Text):
         self.insert(END, self.bgText)
         self.bind("<FocusIn>", self.on_focus_in)
         self.bind("<ButtonRelease-1>", self.on_focus_in)
-        self.bind("<FocusOut>", self.on_focus_out)
         self.bind("<KeyRelease>", self.on_typing)
-        self.bind("<KeyRelease-BackSpace>", self.on_focus_out)
         self.placeholder = True
 
     def on_focus_in(self, e):
         if self.placeholder:
             self.mark_set("insert", "1.0")
-            print(self.index(CURRENT))
 
     def on_typing(self, e):
-        if self.placeholder and self.index(INSERT) > 0:
-            self.delete(self.index(INSERT), END)
+        if self.placeholder and self.index(INSERT) != "1.0":
+            index = self.index(INSERT)
+            self.delete(index, END)
+            if index[0] != "1":
+                self.insert(END, "\n")
             self["fg"] = "black"
             self.placeholder = False
-
-    def on_focus_out(self, e):
-        if not len(self.get()) > 0:
+        elif not len(self.get("1.0", END)) > 1:
             self.insert(END, self.bgText)
             self["fg"] = "grey"
             self.placeholder = True
-            self.mark_set("insert", "1.1")
+            self.mark_set("insert", "1.0")
+
+    def get(self, *args):
+        if self.placeholder:
+            return ""
+        else:
+            super(*args)

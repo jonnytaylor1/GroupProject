@@ -82,17 +82,17 @@ class Settings(Frame):
         self.formFrame = Frame(self.footer)
         self.formFrame.grid(column=1, row=0)
 
-        self.question = {"correct": StringVar(), "incorrect": [StringVar(), StringVar(), StringVar()]}
+        self.question = {"incorrect": []}
 
-        self.question["text"] = Text(self.formFrame, width = 30, height = 2)
+        self.question["text"] = BetterText(self.formFrame, width = 30, height = 2, bgText="Enter Question Prompt")
         self.question["text"].grid(row = 0, column = 0)
 
-        c_entry = BetterEntry(self.formFrame, textvariable=self.question["correct"], bgText="Enter The Answer")
-        c_entry.grid(row=0, column=1)
+        self.question["correct"] = BetterEntry(self.formFrame,  bgText="Enter The Answer")
+        self.question["correct"].grid(row=0, column=1)
 
         for i in range(3):
-            entry = BetterEntry(self.formFrame, textvariable=self.question["incorrect"][i], bgText=f"Enter Wrong Choice {i+1}")
-            entry.grid(row=0, column=2 + i)
+            self.question["incorrect"].append(BetterEntry(self.formFrame, bgText=f"Enter Wrong Choice {i+1}"))
+            self.question["incorrect"][i].grid(row=0, column=2 + i)
 
         self.b_add["command"] = self.send_q_data
         self.b_add["text"] = "Save"

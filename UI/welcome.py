@@ -30,4 +30,4 @@ class Welcome(Page):
         HoverButton(self, text="Hangman", font=b_font, pos=(4, 0, NSEW), command=self.go_to("Hangman"))
 
         #Button goes to a test area for debugging
-        HoverButton(self, text="Test", font=b_font, pos=(5, 0, NSEW), command=self.go_to("Test"))
+        # HoverButton(self, text="Test", font=b_font, pos=(5, 0, NSEW), command=self.go_to("Test"))

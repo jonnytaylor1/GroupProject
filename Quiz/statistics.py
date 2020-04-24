@@ -1,6 +1,7 @@
 from data.connection import Connection
 from collections import namedtuple
 import datetime
+from functools import reduce
 
 class Statistics():
     def __init__(self):
@@ -14,7 +15,7 @@ class Statistics():
             CREATE TABLE IF NOT EXISTS statistics(
             id INTEGER PRIMARY KEY,
             question_id INTEGER,
-            quiz_format INTEGER,
+            quiz_format TEXT,
             corrects INTEGER,
             incorrects INTEGER,
             skips INTEGER,
@@ -28,7 +29,7 @@ class Statistics():
             CREATE TABLE IF NOT EXISTS answer_stats(
             id INTEGER PRIMARY KEY,
             question_id INTEGER,
-            quiz_format INTEGER,
+            quiz_format TEXT,
             status TEXT,
             time INTEGER,
             created_at TIMESTAMP,
@@ -61,13 +62,13 @@ class Statistics():
     def create_stats(id):
         with Connection() as con:
             with con:
-                for format in range(1,3):
+                for format in ["Multi-Choice", "Hangman"]:
                     con.execute('''
                     INSERT INTO statistics
                     (question_id, quiz_format, corrects, incorrects, skips, abandons, time)
                     VALUES
                     (?, ?, 0, 0, 0, 0, 0)
-                    ''', (id, str(format)))
+                    ''', (id, format))
 
     # returns stats for a question id
     # time is represented by 10^(-1) seconds
@@ -168,12 +169,14 @@ class Statistics():
                 INNER JOIN packages
                 ON questions.package_id = packages.package_id)
                 ''')):
-                    self.q_bank.append(Question(row[-1] and row[-2] == int(row[-1][5]), *row[:12]))
+                    q = Question(row[-1] == row[-2], *row[:-1])
+                    self.q_bank.append(q)
+                    print(q)
 
 
     def load_stats2(self):
         Question = namedtuple("Question",
-                              ["currently_assigned", "q_id", "text", "correct", "in1", "in2", "in3", "time", "status", "created_at", "quiz", "package_id"])
+                              ["currently_assigned", "q_id", "text", "correct", "in1", "in2", "in3", "time", "status", "created_at", "package_id", "package_name", "quiz" ])
         with Connection() as con:
             with con:
                 for i, row in enumerate(con.execute('''
@@ -187,6 +190,7 @@ class Statistics():
                 status,
                 created_at,
                 questions.package_id,
+                packages.name,
                 answer_stats.quiz_format,
                 packages.quiz_format
                 FROM ((answer_stats
@@ -195,7 +199,8 @@ class Statistics():
                 INNER JOIN packages
                 ON questions.package_id = packages.package_id)
                 ''')):
-                    self.q_bank.append(Question(row[-1] and row[-2] == int(row[-1][5]),*row[:-1]))
+                    self.q_bank.append(Question(row[-1] == row[-2],*row[:-1]))
+
 
     def get_overall_stats_old(self):
         self.load_stats()
@@ -203,4 +208,15 @@ class Statistics():
 
     def get_overall_stats(self):
         self.load_stats2()
-        return self.q_bank
+        Question = namedtuple("Question",
+                              ["currently_assigned", "q_id", "text", "correct", "in1", "in2", "in3", "times", "status",
+                               "created_at", "package_id", "package_name", "quiz"])
+        def data_reducer(acc, q):
+            for y in acc:
+                if(q.q_id == y.q_id and q.quiz == y.quiz):
+                    y.times.append(q.time)
+                    return acc
+            acc.append(Question(*q[:7], [q.time], *q[8:]))
+            return acc
+
+        return reduce(data_reducer, self.q_bank, [])

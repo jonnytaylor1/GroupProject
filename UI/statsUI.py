@@ -30,7 +30,6 @@ class StatsTable(Treeview):
         # no db yet so invent some data
         #if you want to show only stats for questions that are currently loaded into the quiz check if currently assigned like below:
         self.data = [data for data in StatDB().get_overall_stats_old() if data.quiz == quiz and data.currently_assigned]
-        print(self.data[0])
         self.insert_data(self.data)
 
         # initial sort by question number after creation, just in case
@@ -154,8 +153,8 @@ class Statistics(Frame):
         self.quiz_one = QuizView(self.tabbed_section, 1, borderwidth=0, highlightthickness=0)
         self.quiz_two = QuizView(self.tabbed_section, 2)
         # attach tabs
-        self.tabbed_section.add(self.quiz_one, text="Quiz 1")
-        self.tabbed_section.add(self.quiz_two, text="Quiz 2")
+        self.tabbed_section.add(self.quiz_one, text="Multi-Choice")
+        self.tabbed_section.add(self.quiz_two, text="Hangman")
 
         # FIXME: padding
         self.tabbed_section.grid(row=2, padx=20, sticky="n")
@@ -165,4 +164,4 @@ class Statistics(Frame):
 
     def back(self):
         self.grid_forget()
-        self.parent.pages["Welcome"].grid()
+        self.parent.pages["Welcome"].show()

@@ -1,4 +1,6 @@
 from tkinter import *
+from UI import *
+
 # This is a start page for the program
 
 
@@ -24,42 +26,25 @@ class Welcome(Frame):
             Grid.rowconfigure(self, rows, weight=1)
         for columns in range(1):  # Number of columns
             Grid.columnconfigure(self, columns, weight=1)
-        label = Label(self, text="Welcome!", font=("MS", 15, "bold"))
-        label.grid(row=0, column=0, sticky=N+S+E+W)
 
-        b1 = Button(self, text="Start", font = ("MS", 8, "bold"))
-        self.bind_hover(b1)
-        b1.grid(row=1, column=0, sticky=N+S+E+W)
+        b_font = ("MS", 8, "bold")
+        GridLabel(self, text="Welcome!", font=("MS", 15, "bold"), pos=(0, 0, NSEW))
 
-        b1["command"] = self.start_quiz
+        #Button goes to multiplechoice quiz
+        HoverButton(self, text="Start", font=b_font, pos=(1, 0, NSEW), command=self.start_quiz)
 
         #J Goes to packages menu
+        HoverButton(self, text="Packages Menu", font=b_font, pos=(2, 0, NSEW), command=self.go_to_packages)
 
-        b2 = Button(self, text="Packages Menu", font=("MS", 8, "bold"))
-        self.bind_hover(b2)
-        b2.grid(row = 2, column=0, sticky=N+S+E+W)
+        #Button goes to statistics
+        HoverButton(self, text="Statistics", font=b_font, pos=(3, 0, NSEW), command=self.go_to_statistics)
 
-        b2["command"] = self.go_to_packages
+        #Button goes to hangman
+        HoverButton(self, text="Hangman", font=b_font, pos=(4, 0, NSEW), command=self.go_to_hangman)
 
-        b3 = Button(self, text="Statistics", font=("MS", 8, "bold"))
-        self.bind_hover(b3)
-        b3.grid(row=3, column=0, sticky=N+S+E+W)
-        b3["command"] = self.go_to_statistics
+        #Button goes to a test area for debugging
+        # HoverButton(self, text="Test", font=b_font, pos=(5, 0, NSEW), command=self.go_to_test)
 
-        b4 = Button(self, text="Hangman", font=("MS", 8, "bold"),command=lambda x=self: x.go_to_hangman())
-        self.bind_hover(b4)
-        b4.grid(row=4, column=0, sticky=N+S+E+W)
-
-    # Bind Hover
-    @staticmethod
-    def bind_hover(element):
-        """
-
-        :param element: Button element on which the hover is applied
-        :return:
-       """
-        element.bind("<Enter>", lambda event, h=element: h.configure(bg="#a6a6a6", fg="#ffffff"))
-        element.bind("<Leave>", lambda event, h=element: h.configure(bg="#e8e6e6", fg="#000000"))
     # goes to  the Multiple choice page
 
     def start_quiz(self):
@@ -69,7 +54,7 @@ class Welcome(Frame):
     # Go to package page
     def go_to_packages(self):
         self.grid_forget()
-        self.parent.pages["PackageMenu"].grid()
+        self.parent.pages["PackageMenu"].show()
 
     def go_to_statistics(self):
         self.grid_forget()
@@ -78,3 +63,7 @@ class Welcome(Frame):
     def go_to_hangman(self):
         self.grid_forget()
         self.parent.pages["Hangman"].grid()
+
+    def go_to_test(self):
+        self.grid_forget()
+        self.parent.pages["Test"].show()

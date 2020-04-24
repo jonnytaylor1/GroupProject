@@ -15,13 +15,15 @@ class MainUI():
         self.timer = StringVar()
         self.clock1 = time.time()
         # specify here which page you would like to add
+
         self.pages = {"Welcome": Welcome(self),
                       "Settings": Settings(self),
                       "MultipleChoice": MultipleChoice(self),
                       "PackageMenu": PackageMenu(self),
                       "EndScreen": EndScreen(self),
                       "Statistics": Statistics(self),
-                      "Hangman": Hangman(self)}
+                      "Hangman": Hangman(self),
+                      "Test": Test(self)}
 
         # this is the first page to show
         self.curr_window = self.pages["Welcome"]
@@ -35,6 +37,13 @@ class MainUI():
         self.timer.set(f"{int_diff // 600}{(int_diff // 60) % 10}:{(int_diff // 10) % 6}{int_diff % 10}")
         # Updates the clock every 100 ms
         self.root.after(100, self.update_clock)
+
+
+    def update_window_size(self, frame):
+        self.root.update()
+        height = frame.winfo_reqheight()
+        width = frame.winfo_reqwidth()
+        self.root.geometry(f'{width + 20}x{height}')
 
     def run(self):
         self.curr_window.grid()

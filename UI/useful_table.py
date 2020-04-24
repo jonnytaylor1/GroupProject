@@ -3,7 +3,7 @@ from tkinter import *
 
 class UsefulTable(Frame):
     def __init__(self, parent):
-        Frame.__init__(self, parent.root)
+        super().__init__(parent.root)
         self.parent = parent
         self.scrollbar = Scrollbar(self.parent.root, orient="vertical")
         self.scrollbar.grid_forget()

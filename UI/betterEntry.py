@@ -1,8 +1,9 @@
 from tkinter import *
+from UI.easyGrid import EasyGrid
 
-class BetterEntry(Entry):
+class BetterEntry(EasyGrid, Entry):
     def __init__(self, *args, bgText, **kwargs):
-        Entry.__init__(self, *args, fg="grey", **kwargs)
+        super().__init__(*args, fg="grey", **kwargs)
         self.bgText = bgText
         self.insert(END, self.bgText)
         self.bind("<FocusIn>", self.on_focus_in)
@@ -31,9 +32,9 @@ class BetterEntry(Entry):
         else:
             return super().get()
 
-class BetterText(Text):
+class BetterText(EasyGrid, Text):
     def __init__(self, *args, bgText, **kwargs):
-        Text.__init__(self, *args, fg="grey", **kwargs)
+        super().__init__(*args, fg="grey", **kwargs)
         self.bgText = bgText
         self.insert(END, self.bgText)
         self.bind("<FocusIn>", self.on_focus_in)

@@ -2,12 +2,12 @@ from tkinter import *
 import time
 import tkinter.messagebox
 from PIL import Image, ImageTk
+from UI import *
 
 
-class Hangman(Frame):
-    def __init__(self, parent):
-        self.parent = parent
-        Frame.__init__(self, parent.root)
+class Hangman(Page):
+    def __init__(self, mainUI):
+        super().__init__(mainUI)
 
         # root.tag_raise(canvas)
 
@@ -38,19 +38,9 @@ class Hangman(Frame):
 
     def go_to_welcome(self):
         self.grid_forget()
-        self.parent.pages["Welcome"].show()
+        self.mainUI.pages["Welcome"].show()
 
 
 
         # imagetk = ImageTk.PhotoImage(image)
         # imagesprite = canvas.create_image(0,0,image=imagetk, anchor = NW)
-
-
-
-
-
-
-
-
-
-#Main

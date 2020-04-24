@@ -70,15 +70,12 @@ class Multiplechoice():
         with Connection() as con:
             con.execute("CREATE TABLE IF NOT EXISTS questions (id INTEGER PRIMARY KEY, question TEXT, correct TEXT, incorrect1 TEXT, incorrect2 TEXT, incorrect3 TEXT, package_id INTEGER, FOREIGN KEY (package_id) REFERENCES packages (package_id))")
 
-    def add_question(q):
-        b, c, d = q["incorrect"]
-        id = 0
+    def create_question(*, prompt, answer, incorrect1, incorrect2, incorrect3, package_id):
         with Connection() as con:
             with con:
-                y = con.execute("INSERT INTO questions(question, correct, incorrect1, incorrect2, incorrect3, package_id) values (?,?,?,?,?,?)", (q["text"], q["correct"], b, c, d, q["package_id"]))
-                id = y.lastrowid
-        Statistics.create_stats(id)
-
+                con.execute("INSERT INTO questions(question, correct, "+
+                            "incorrect1, incorrect2, incorrect3, package_id) values (?,?,?,?,?,?)",
+                            (prompt, answer, incorrect1, incorrect2, incorrect3, package_id))
 
 
     def get_questions(self, random = False):

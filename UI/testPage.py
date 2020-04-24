@@ -3,13 +3,13 @@ from UI import *
 
 
 
-class Test(Frame):
+class Test(Page):
 
-    def __init__(self, parent):
-        Frame.__init__(self, parent.root)
-        self.parent = parent
+    def __init__(self, mainUI):
+        super().__init__(mainUI)
 
     def show(self):
+        super().show()
         self.grid()
         self.hb = HoverButton(self, text="click me", command=self.click)
         self.hb.grid()
@@ -17,4 +17,3 @@ class Test(Frame):
     def click(self):
         self.hb["state"] = DISABLED
         self.hb["bg"] = "green"
-        print(ttk.Widget.__subclasses__())

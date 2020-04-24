@@ -5,26 +5,16 @@ from Quiz.package import Package
 from UI import *
 
 
-class PackageMenu(Frame):
+class PackageMenu(Page):
 
-    def __init__(self, parent):
-        Frame.__init__(self, parent.root)
-        self.parent = parent
-        self.subFrame = Frame(self)
-        self.subFrame.grid()
+    def __init__(self, mainUI):
+        super().__init__(mainUI)
 
     def list_packages(self):
         self.subFrame = Frame(self)
         self.subFrame.grid(row = 0, column = 0, sticky=NSEW)
-
-        self.table = TableView(self.subFrame, self.parent.root)
-        self.table.grid()
-
-        self.table.add_column(
-            h_constructor=lambda f: Label(f, text="Package Name"),
-            cell_constructor=lambda f, id: Label(f),
-            property="name"
-        )
+        self.table = TableView(self.subFrame, self.mainUI.root).show()
+        self.table.add_column(title="Package Name", property="name")
         def drop_constructor(f, row_id):
             format_selected = StringVar()
             choices = ['None', 'Multi-Choice', 'Hangman']
@@ -32,27 +22,21 @@ class PackageMenu(Frame):
             format_selector = OptionMenu(f, format_selected, *choices, command=lambda value=format_selected.get(), package_id = self.table.data[row_id]["package_id"]: self.assign_format(package_id, value))
             # format_selector["command"] = lambda value=format_selected.get(), package_id = self.table.data[row_id]["package_id"]: self.assign_format(package_id, value)
             return format_selector
-
+        self.table.add_column(title="Quiz Format", cell_constructor=drop_constructor, property="quiz_format")
         self.table.add_column(
-            h_constructor=lambda f: Label(f, text="Quiz Format"),
-            cell_constructor=drop_constructor,
-            property="quiz_format"
+            cell_constructor=lambda f, id: HoverButton(f, text="Edit Package Name",
+                                                       command=lambda row_id=id: self.edit_p(row_id))
         )
-
         self.table.add_column(
-            cell_constructor=lambda f, id: HoverButton(f, text="Edit Package Name", command=lambda row_id=id: self.edit_p(row_id))
+            cell_constructor=lambda f, id: HoverButton(f, text="Edit Package Questions",
+                command=lambda package_id = self.table.data[id]["package_id"]: self.go_to_package_questions(package_id) )
         )
-
         self.table.add_column(
-            cell_constructor=lambda f, id: HoverButton(f, text="Edit Package Questions", command=lambda package_id = self.table.data[id]["package_id"]: self.go_to_package_questions(package_id) )
-        )
-
-        self.table.add_column(
-            cell_constructor=lambda f, id: HoverButton(f, text="Delete", command=lambda package_id=self.table.data[id]["package_id"]: self.del_p(package_id))
+            cell_constructor=lambda f, id: HoverButton(f, text="Delete",
+                command=lambda package_id=self.table.data[id]["package_id"]: self.del_p(package_id))
         )
 
         self.table.data = Package().package_bank
-
 
         self.footer = Frame(self.subFrame)
         self.footer.grid(row=1, column=0, sticky=NSEW)
@@ -64,10 +48,6 @@ class PackageMenu(Frame):
 
         # left for debugging purposes
         # Button(self.subFrame, text="Refresh", command=self.refresh).grid(row=4, column=4, sticky = SE)
-
-
-
-
 
 # Updates the table with the format selected for the package (error handling: quiz format is unique and so only one package
 # can be "Multi-Choice" and one package can be "Hangman", all other packages quiz format are set to null in the table
@@ -87,20 +67,12 @@ class PackageMenu(Frame):
     def create_p_form(self):
         # self.add_new_package_b.destroy()
         self.refresh()
-
         self.formFrame = Frame(self.footer)
         self.formFrame.grid(row=0, column=1)
-
-
-        # Label(self.formFrame, text = "New Package Name").grid(row = 0, column = 0, sticky = E)
-
-        self.package_name = BetterEntry(self.formFrame, bgText="Enter Package Name")
-        self.package_name.grid(row = 0, column = 1, sticky = W)
-
+        self.package_name = BetterEntry(self.formFrame, bgText="Enter Package Name", pos=(0, 1, W))
         self.add_new_package_b["command"] = self.send_p_data
         self.add_new_package_b["text"] = "Create"
-
-        self.parent.root.update()
+        self.mainUI.root.update()
 
 # Adds the new package to the database (Error handling: ensures that the package name is unique and is not blank)
     def send_p_data(self):
@@ -113,13 +85,10 @@ class PackageMenu(Frame):
             except sqlite3.IntegrityError:
                 messagebox.showinfo("Alert", "There is already a package with this name, please choose a different name")
 
-
-
 # Goes back to the main menu
     def go_menu(self):
-        self.grid_forget()
         self.table.scrollbar.grid_forget()
-        self.parent.pages["Welcome"].show()
+        self.go_to("Welcome")()
 
     def refresh(self):
         try:
@@ -127,7 +96,7 @@ class PackageMenu(Frame):
         except:
             pass
         self.list_packages()
-        self.parent.update_window_size(self)
+        self.mainUI.update_window_size(self)
 
 # Deletes the package
     def del_p(self, i):
@@ -167,15 +136,12 @@ class PackageMenu(Frame):
             except sqlite3.IntegrityError:
                 messagebox.showinfo("Alert", "There is already a package with this name, please choose a different name")
 
-
-# Will eventually go to the packages questions
     def go_to_package_questions(self, package_id):
-        self.grid_forget()
         self.table.scrollbar.grid_forget()
-        self.parent.pages["Settings"].show(package_id)
+        self.go_to("Settings")(package_id)
 
     def show(self):
-        self.grid(column=0, row=0, sticky=NSEW)
+        super().show()
         self.refresh()
 
 

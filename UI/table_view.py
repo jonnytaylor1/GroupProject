@@ -1,9 +1,9 @@
 from tkinter import *
+from UI import EasyGrid
 
-
-class TableView(Frame):
+class TableView(EasyGrid, Frame):
     def __init__(self, parent, root):
-        Frame.__init__(self, parent)
+        super().__init__(parent)
         self.parent = parent
         self.root = root
         self.scrollbar = Scrollbar(self.root, orient="vertical")
@@ -22,11 +22,11 @@ class TableView(Frame):
         self.cell_constructors = []
         self.matrix = []
 
-    def add_column(self, *, h_constructor=None, cell_constructor=None, property=""):
+    def add_column(self, *, title=None, h_constructor=None, cell_constructor=None, property=""):
         try:
             heading = h_constructor(self.headingsFrame)
         except:
-            heading = Label(self.headingsFrame)
+            heading = Label(self.headingsFrame, text=title)
         self.headings.append(Cell(heading, row=0, column=self.columns))
         if cell_constructor:
             self.cell_constructors.append(cell_constructor)

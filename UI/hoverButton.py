@@ -12,6 +12,7 @@ class HoverButton(EasyGrid, Button):
 
     # applies event listeners to check for mouse entering and exiting the bounds of the button
     def add_hover_effect(self):
+        self.configure(bg=self.bg, fg=self.fg)
         self.bind("<Enter>", lambda event, h=self: h.configure(bg=self.bg_hover, fg=self.fg_hover))
         self.bind("<Leave>", lambda event, h=self: h.configure(bg=self.bg, fg=self.fg))
 
@@ -36,6 +37,7 @@ class HoverButton(EasyGrid, Button):
             if value == DISABLED:
                 self.remove_hover_effect()
             elif value == NORMAL:
+
                 self.add_hover_effect()
 
         return super().__setitem__(key, value)

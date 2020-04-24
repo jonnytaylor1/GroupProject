@@ -19,7 +19,7 @@ class BetterEntry(Entry):
             self.delete(self.index(INSERT), END)
             self["fg"] = "black"
             self.placeholder = False
-        elif not len(self.get()) > 0:
+        elif not len(self.get()) > 0 and not self.placeholder:
             self.insert(END, self.bgText)
             self["fg"] = "grey"
             self.placeholder = True
@@ -53,7 +53,7 @@ class BetterText(Text):
                 self.insert(END, "\n")
             self["fg"] = "black"
             self.placeholder = False
-        elif not len(self.get("1.0", END)) > 1:
+        elif not len(self.get("1.0", END)) > 1 and not self.placeholder:
             self.insert(END, self.bgText)
             self["fg"] = "grey"
             self.placeholder = True
@@ -63,4 +63,5 @@ class BetterText(Text):
         if self.placeholder:
             return ""
         else:
-            super().get(*args)
+
+            return super().get(*args)

@@ -1,111 +1,122 @@
 from tkinter import *
+from UI import *
 from Quiz.multiplechoice import Multiplechoice
 # create Settings UI for the quiz
-class Settings(Frame):
-    def __init__(self, parent):
-        Frame.__init__(self, parent.root)
-        self.parent = parent
-        self.subFrame = Frame(self)
-        self.subFrame.grid()
+class Settings(Page):
 
     # list questions imported from the Multiple choice model
-    def list_qs(self, package_id):
-        self.package_id = package_id
-        self.subFrame = Frame(self)
-        self.subFrame.grid()
-        h_row = 1
-        h_font = ("MS", 10, "bold")
-        Label(self.subFrame, text="Question Prompt", font = h_font).grid(row=h_row, column=2)
-        Label(self.subFrame, text="Answer", font = h_font).grid(row=h_row, column=3)
-        Label(self.subFrame, text="Incorrect choice 1", font = h_font).grid(row=h_row, column=4)
-        Label(self.subFrame, text="Incorrect choice 2", font = h_font).grid(row=h_row, column=5)
-        Label(self.subFrame, text="Incorrect choice 3", font = h_font).grid(row=h_row, column=6)
-        row = 1
-        self.rows = []
-        for i, q in enumerate(Multiplechoice(package_id).qbank):
-            row += 1
-            l_text = Label(self.subFrame, text = q["text"])
-            l_text.grid(row=row, column=2)
-            l_correct = Label(self.subFrame, text = q["correct"])
-            l_correct.grid(row = row, column =3)
-            inc1 = Label(self.subFrame, text= q["incorrect"][0])
-            inc1.grid(row = row, column = 4)
-            inc2 = Label(self.subFrame, text = q["incorrect"][1])
-            inc2.grid(row = row, column = 5)
-            inc3 = Label(self.subFrame, text = q["incorrect"][2])
-            inc3.grid(row = row, column = 6)
-            b_edit = Button(self.subFrame, text = "Edit")
-            b_edit.grid(row = row, column = 7)
-            b_edit["command"] = lambda row=row, id = q["id"]: self.edit_q(row, id)
-            Button(self.subFrame, text="Delete", command=lambda id = q["id"]: self.del_q(id)).grid(row=row, column=8)
-            self.rows.append([l_text, l_correct, inc1, inc2, inc3])
-        self.b_add = Button(self.subFrame, text = "Add new Question", command= lambda: self.create_q_form(row + 1))
-        self.b_add.grid(row = row + 1, column = 3)
-        Button(self.subFrame, text = "Back - Package Menu", command = self.go_package_menu).grid(row = row + 2, column = 3)
-        # left for debugging purposes
-        Button(self.subFrame, text = "Refresh", command = self.refresh).grid(row = row + 3, column = 3)
+    def create(self):
+        super().create()
+        self.table = TableView(self, self.mainUI.root)
+        self.table.pack(fill=BOTH, expand=1)
 
+        self.table.add_column(title="Question Prompt", property="text")
+        self.table.add_column(title="Answer", property="correct")
+        self.table.add_column(title="Incorrect choice 1", property="in1")
+        self.table.add_column(title="Incorrect choice 2", property="in2")
+        self.table.add_column(title="Incorrect choice 3", property="in3")
+        self.table.add_column(
+            cell_constructor=lambda f, row: HoverButton(f, text="Edit", command=lambda row=row: self.edit_form(row))
+        )
+        self.table.add_column(
+            cell_constructor=lambda f, row: HoverButton(f, text="Delete", command=lambda row=row: self.del_q(row))
+        )
 
-#J Go back to package menu
-    def go_package_menu(self):
-        self.grid_forget()
-        self.parent.root.geometry("1000x500")
-        self.parent.pages["PackageMenu"].grid()
+        self.footer = Frame(self)
+        self.footer.pack(fill=X)
+
+        HoverButton(self.footer, text="Back - Package Menu", command=self.go_to("PackageMenu"), pos=(0, 0, W))
+        self.footer.grid_columnconfigure(2, weight=2)
+        self.b_add = HoverButton(self.footer, text="Add new Question", command=self.new_q_form, pos=(0, 2, E))
+
 
     def save_q(self):
-        in_choices = list(map(lambda el: el.get(), self.question["incorrect"]))
-        Multiplechoice.save_question(self.question["id"], self.question["text"].get("1.0", END).rstrip(), self.question["correct"].get(), *in_choices)
-        self.refresh()
+        Multiplechoice.save_question(self.question["id"], self.question["text"].get("1.0", END).rstrip(), self.question["correct"].get(),
+                                     self.question["in1"].get(), self.question["in2"].get(), self.question["in3"].get())
+
+        self.show()
 
     # send edit form to the database
-    def edit_q(self, row, id):
-        for label in self.rows[row - 2]:
-            label.grid_remove()
-        self.create_q_form(row)
-        self.question["id"], text, correct, inc1, inc2, inc3 = Multiplechoice.get_question(id)
-        self.question["text"].insert(END, text)
-        self.question["correct"].set(correct)
-        self.question["incorrect"][0].set(inc1)
-        self.question["incorrect"][1].set(inc2)
-        self.question["incorrect"][2].set(inc3)
-        self.b["command"] = lambda: self.save_q()
 
     # delete a question in the database
-    def del_q(self, i):
-        Multiplechoice.delete_question(i)
-        self.refresh()
+    def del_q(self, row_id):
+        confirm_message = messagebox.askquestion ('Delete Question','Are you sure you want to delete this question?',icon = 'warning')
+        if confirm_message == "yes":
+            Multiplechoice.delete_question(self.table.data[row_id]["id"])
+        self.show()
 
+    class NewQuestionForm(EasyGrid, Frame):
+
+        def __init__(self, root, page, *args, **kwargs):
+            super().__init__(root, *args, **kwargs)
+            self.page = page
+            self.root = root
+            self.question = {"incorrect": []}
+            self.prompt = BetterText(self, width=30, height=2, bgText="Enter Question Prompt", pos=(0, 0))
+            self.correct = BetterEntry(self, bgText="Enter The Answer", pos=(0, 1))
+            self.incorrect1 = BetterEntry(self, bgText=f"Enter Wrong Choice 1", pos=(0, 2))
+            self.incorrect2 = BetterEntry(self, bgText=f"Enter Wrong Choice 2", pos=(0, 3))
+            self.incorrect3 = BetterEntry(self, bgText=f"Enter Wrong Choice 3", pos=(0, 4))
+
+        # create a new question in the database
+        def send_q_data(self):
+            Multiplechoice.create_question(prompt=self.prompt.get("1.0", END).rstrip(),
+                                           answer=self.correct.get(), incorrect1=self.incorrect1.get(),
+                                           incorrect2=self.incorrect2.get(), incorrect3=self.incorrect3.get(),
+                                           package_id=self.page.package_id)
+            self.grid_forget()
+            self.page.b_add.configure(text="Add new Question", command=self.page.new_q_form)
+            self.page.show()
 
     #  create a new form for the next question
-    def create_q_form(self, new_row):
-        self.b_add.destroy()
-        self.question = {"correct": StringVar(), "incorrect": [StringVar(), StringVar(), StringVar()]}
+    def new_q_form(self):
+        self.show()
+        self.new_question_form = self.NewQuestionForm(self.footer, self, pos=(0, 1))
+        def save_b_handler():
+            self.new_question_form.send_q_data()
+            self.show()
+        self.b_add.configure(command=save_b_handler, text="Create")
+        self.mainUI.update_window_size()
 
-        self.question["text"] = Text(self.subFrame, width = 30, height = 2)
-        self.question["text"].grid(row = new_row, column = 2)
+    def edit_form(self, row_id):
 
-        c_entry = Entry(self.subFrame, textvariable = self.question["correct"])
-        c_entry.grid(row = new_row, column = 3)
+        self.question = {"correct": StringVar(), "in1": StringVar(), "in2": StringVar(), "in3": StringVar()}
 
-        for i in range(3):
-            entry = Entry(self.subFrame, textvariable = self.question["incorrect"][i])
-            entry.grid(row = new_row, column = 4 + i)
+        for i in range(self.table.columns):
+            property = self.table.prop_names[i]
+            if len(property) > 0:
+                if property == "text":
+                    def constructor(frame):
+                        self.question["text"] = Text(frame, width=30, height=2)
+                        return self.question["text"]
+                else:
+                    def constructor(frame):
+                        return Entry(frame, textvariable=self.question[property])
 
-        self.b = Button(self.subFrame, text = "Save", font = ("MS", 8, "bold"))
-        self.b.grid(row = new_row, column = 7)
-        self.b["command"] = self.send_q_data
-    def refresh(self):
-        self.subFrame.destroy()
-        self.list_qs(self.package_id)
+                self.table.set_cell(row=row_id, column=i, func=constructor)
+            else:
+                for row in range(len(self.table.data)):
+                    self.table.get_cell(row=row, column=i).hide()
+        self.table.set_cell(row=row_id, column=5, func=lambda f: HoverButton(f, text="Save", command=self.save_q))
 
-    # create a new question in the database
-    def send_q_data(self):
-        in_choices = list(map( lambda el: el.get(), self.question["incorrect"]))
-        q = {"text": self.question["text"].get("1.0", END).rstrip(), "correct": self.question["correct"].get(), "incorrect": in_choices, "package_id": self.package_id}
-        Multiplechoice.add_question(q)
-        self.refresh()
-    def show(self, package_id):
-        self.subFrame.destroy()
-        self.parent.root.geometry("1300x500")
-        self.list_qs(package_id)
-        self.grid()
+
+        self.question["id"], text, correct, inc1, inc2, inc3 = Multiplechoice.get_question(self.table.data[row_id]["id"])
+
+        self.question["text"].insert(END, text)
+        self.question["correct"].set(correct)
+        self.question["in1"].set(inc1)
+        self.question["in2"].set(inc2)
+        self.question["in3"].set(inc3)
+
+        self.mainUI.update_window_size()
+
+
+    def before_showing(self, package_id=None):
+        if package_id: self.package_id = package_id
+        self.table.data = Multiplechoice(self.package_id, True).qbank
+
+    def before_leaving(self):
+        super().before_leaving()
+        self.table.end()
+        self.new_question_form.grid_forget()
+        self.b_add.configure(text="Add new Question", command=self.new_q_form)

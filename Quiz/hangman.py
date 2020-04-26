@@ -27,7 +27,7 @@ class Hangman():
                             FROM questions
                             INNER JOIN packages
                             ON questions.package_id = packages.package_id
-                            WHERE packages.quiz_format = 'Quiz 2'
+                            WHERE packages.quiz_format = 'Hangman'
                 '''):
                     print(row[0])
                     bank.append(

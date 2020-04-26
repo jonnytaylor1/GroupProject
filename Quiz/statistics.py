@@ -1,5 +1,7 @@
 from data.connection import Connection
 from collections import namedtuple
+import datetime
+from functools import reduce
 
 class Statistics():
     def __init__(self):
@@ -13,7 +15,7 @@ class Statistics():
             CREATE TABLE IF NOT EXISTS statistics(
             id INTEGER PRIMARY KEY,
             question_id INTEGER,
-            quiz_format INTEGER,
+            quiz_format TEXT,
             corrects INTEGER,
             incorrects INTEGER,
             skips INTEGER,
@@ -22,17 +24,61 @@ class Statistics():
             FOREIGN KEY(question_id) REFERENCES questions(id)
             )''')
 
+        with Connection() as con:
+            con.execute('''
+            CREATE TABLE IF NOT EXISTS answer_stats(
+            id INTEGER PRIMARY KEY,
+            question_id INTEGER,
+            quiz_format TEXT,
+            status TEXT,
+            time INTEGER,
+            created_at TIMESTAMP,
+            FOREIGN KEY(question_id) REFERENCES questions(id)
+            )''')
+
+    # Save stats for a single unique answer from the user
+    def create_answer_stats(obj):
+        with Connection() as con:
+            with con:
+                con.execute('''
+                INSERT INTO answer_stats
+                (question_id, quiz_format, status, time, created_at)
+                VALUES
+                (?, ?, ?, ?, ?)
+                ''', (obj["id"], obj["quiz_format"], obj["status"], obj["time"], datetime.datetime.now()))
+
+    def save_answer_stats(*, id, quiz_format, status, time, created_at):
+        with Connection() as con:
+            with con:
+                con.execute('''
+                INSERT INTO answer_stats
+                (question_id, quiz_format, status, time, created_at)
+                VALUES
+                (?, ?, ?, ?, ?)
+                ''', (str(id), quiz_format, status, str(time), created_at))
+
+
+    # def update_answer_stats(obj):
+    #     with Connection() as con:
+    #         with con:
+    #             con.execute('''
+    #             INSERT INTO answer_stats
+    #             (question_id, quiz_format, is_correct, is_abandoned, time_spent, time_stamp)
+    #             VALUES
+    #             ()
+    #             ''')
+
     # creates a new stats entry for a new question and sets all values to 0
     def create_stats(id):
         with Connection() as con:
             with con:
-                for format in range(1,3):
+                for format in ["Multi-Choice", "Hangman"]:
                     con.execute('''
                     INSERT INTO statistics
                     (question_id, quiz_format, corrects, incorrects, skips, abandons, time)
                     VALUES
                     (?, ?, 0, 0, 0, 0, 0)
-                    ''', (id, str(format)))
+                    ''', (id, format))
 
     # returns stats for a question id
     # time is represented by 10^(-1) seconds
@@ -51,6 +97,27 @@ class Statistics():
                 WHERE question_id = ?
                 AND quiz_format = ?
                 ''', (str(id), str(quiz))).fetchone()
+
+
+    def get_answer_stats(id):
+        with Connection() as con:
+            with con:
+                return con.execute('''
+                SELECT questions.id,
+                quiz_format,
+                status,
+                question,
+                correct,
+                incorrect1,
+                incorrect2,
+                incorrect3,
+                time,
+                created_at
+                FROM (answer_stats
+                INNER JOIN questions
+                ON answer_stats.question_id = questions.id)
+                WHERE question_id = ?
+                ''', (str(id))).fetchall()
 
     # increments existing stats by this amount
     def increment_stats(obj):
@@ -89,7 +156,7 @@ class Statistics():
 
     def load_stats(self):
         Question = namedtuple("Question",
-                              ["q_id", "text", "correct", "in1", "in2", "in3", "corrects", "incorrects", "skips", "abandons", "total_time", "quiz"])
+                              ["currently_assigned", "q_id", "text", "correct", "in1", "in2", "in3", "successes", "failures", "skips", "abandons", "total_time", "quiz"])
         with Connection() as con:
             with con:
                 for i, row in enumerate(con.execute('''
@@ -104,16 +171,62 @@ class Statistics():
                 skips,
                 abandons,
                 time,
-                statistics.quiz_format
+                statistics.quiz_format,
+                packages.quiz_format
                 FROM ((questions
                 INNER JOIN statistics
                 ON questions.id = statistics.question_id)
                 INNER JOIN packages
                 ON questions.package_id = packages.package_id)
                 ''')):
-                    print(*row)
-                    self.q_bank.append(Question(*row))
+                    q = Question(row[-1] == row[-2], *row[:-1])
+                    self.q_bank.append(q)
+                    print(q)
 
-    def get_overall_stats(self):
+
+    def load_stats2(self):
+        Question = namedtuple("Question",
+                              ["currently_assigned", "q_id", "text", "correct", "in1", "in2", "in3", "time", "status", "created_at", "package_id", "package_name", "quiz" ])
+        with Connection() as con:
+            with con:
+                for i, row in enumerate(con.execute('''
+                SELECT questions.id,
+                question,
+                correct,
+                incorrect1,
+                incorrect2,
+                incorrect3,
+                time,
+                status,
+                created_at,
+                questions.package_id,
+                packages.name,
+                answer_stats.quiz_format,
+                packages.quiz_format
+                FROM ((answer_stats
+                INNER JOIN questions
+                ON answer_stats.question_id = questions.id)
+                INNER JOIN packages
+                ON questions.package_id = packages.package_id)
+                ''')):
+                    self.q_bank.append(Question(row[-1] == row[-2],*row[:-1]))
+
+
+    def get_overall_stats_old(self):
         self.load_stats()
         return self.q_bank
+
+    def get_overall_stats(self):
+        self.load_stats2()
+        Question = namedtuple("Question",
+                              ["currently_assigned", "q_id", "text", "correct", "in1", "in2", "in3", "times", "status",
+                               "created_at", "package_id", "package_name", "quiz"])
+        def data_reducer(acc, q):
+            for y in acc:
+                if(q.q_id == y.q_id and q.quiz == y.quiz):
+                    y.times.append(q.time)
+                    return acc
+            acc.append(Question(*q[:7], [q.time], *q[8:]))
+            return acc
+
+        return reduce(data_reducer, self.q_bank, [])

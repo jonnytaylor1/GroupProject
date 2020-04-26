@@ -1,40 +1,31 @@
 from tkinter import *
+from UI import *
+
 # This is a start page for the program
-class Welcome(Frame):
-    def __init__(self, parent):
-        self.parent = parent
-        Frame.__init__(self, parent.root)
-        self.create_welcome()
+class Welcome(Page):
 
-    def create_welcome(self):
-        l = Label(self, text = "Welcome!", font = ("MS", 15, "bold"))
-        l.grid(row = 2, column = 2, columnspan = 4)
-        b1 = Button(self, text = "Start", font = ("MS", 8, "bold"))
-        b1.grid(row = 3, column = 3, columnspan = 5)
-        b1["command"] = self.start_quiz
-#J Goes to packages menu
-        b2 = Button(self, text="Packages Menu", font=("MS", 8, "bold"))
-        b2.grid(row = 4, column = 3, columnspan=5)
-        b2["command"] = self.go_to_packages
-        b3 = Button(self, text="Statistics", font=("MS", 8, "bold"))
-        b3.grid(row=5, column=3, columnspan=5)
-        b3["command"] = self.go_to_statistics
-        Button(self, text="Hangman", command=lambda x=self: x.go_to_hangman()).grid(row=6, column=3)
+    def show(self):
+        super().show()
+        self.mainUI.root.geometry("500x500") # decides the size of the window
 
-    # goes to  the Multiple choice page
-    def start_quiz(self):
-        self.grid_forget()
-        self.parent.pages["MultipleChoice"].show()
+    def create(self):
+        # Creating the grid
+        self.autoresize_grid(rows=6, columns=1)
 
-    # Go to package page
-    def go_to_packages(self):
-        self.grid_forget()
-        self.parent.pages["PackageMenu"].grid()
+        b_font = ("MS", 8, "bold")
+        GridLabel(self, text="Welcome!", font=("MS", 15, "bold"), pos=(0, 0, NSEW))
 
-    def go_to_statistics(self):
-        self.grid_forget()
-        self.parent.pages["Statistics"].grid()
+        #Button goes to multiplechoice quiz
+        HoverButton(self, text="Start", font=b_font, pos=(1, 0, NSEW), command=self.go_to("MultipleChoice"))
 
-    def go_to_hangman(self):
-        self.grid_forget()
-        self.parent.pages["Hangman"].grid()
+        #J Goes to packages menu
+        HoverButton(self, text="Packages Menu", font=b_font, pos=(2, 0, NSEW), command=self.go_to("PackageMenu"))
+
+        #Button goes to statistics
+        HoverButton(self, text="Statistics", font=b_font, pos=(3, 0, NSEW), command=self.go_to("Statistics"))
+
+        #Button goes to hangman
+        HoverButton(self, text="Hangman", font=b_font, pos=(4, 0, NSEW), command=self.go_to("Hangman"))
+
+        #Button goes to a test area for debugging
+        # HoverButton(self, text="Test", font=b_font, pos=(5, 0, NSEW), command=self.go_to("Test"))

@@ -15,13 +15,21 @@ class TimerLabel(EasyGrid, Label):
         self.id = self.mainUI.add_listener(self.update)
 
     def update(self):
-        self.diff = self.mainUI.clock - self.start_time
-        secs = self.diff.seconds % 60
-        mins = self.diff.seconds // 60
-        self.displayed_time.set(f"{mins if mins > 9 else '0' + str(mins)}:{secs if secs > 9 else '0' + str(secs)}.{str(self.diff.microseconds)[0]}")
+        self.time = self.mainUI.clock - self.start_time
+        self.displayed_time.set(formatter(self.time))
 
     def pause(self):
         self.mainUI.listeners.remove(self.update)
 
     def refresh(self):
         self.displayed_time.set("0")
+
+
+def formatter(time):
+    def form00(val): return str(val) if val > 9 else f"0{val}"
+    tenths = str(time.microseconds)[0]
+    secs = time.seconds % 60
+    mins = time.seconds // 60
+    return f"{form00(mins)}:{form00(secs)}.{tenths}"
+
+

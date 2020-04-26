@@ -22,7 +22,7 @@ class Hangman(Page):
 
         GridLabel(self, text = "", pos=(9, 7))
 
-        self.skip_button = HoverButton(self, text="Skip", pos=(10, 7, E), cspan=2) #everything with self.... in order to be able to reuse later.
+        self.skip_button = HoverButton(self, text="Skip", command=self.next_q, pos=(10, 7, E), cspan=2) #everything with self.... in order to be able to reuse later.
         self.restart_button = HoverButton(self, text="Restart", command=self.show, pos=(10, 9), cspan=3) #runs refresh() no parenthesis though, otherwise runs immediatley not when pressed
 
         self.end_quiz_button = HoverButton(self, text="End Quiz", command=self.go_to("Welcome"), pos=(10, 12, W), cspan=3)
@@ -33,10 +33,9 @@ class Hangman(Page):
         GridLabel(self, text="Incorrect Letters: ", pos=(3, 18), cspan=6)
         #THIS creates a place for the image, but it is empty, when refresh is run, we implement the initial image.
         self.canvas = GridLabel(self, pos=(4, 1), rspan=11, cspan=5)
-        self.questions = HangmanDB.get_hangman_qs(True) # randomly retrieve Hangman QUestions from the backend
 
-    def show(self):
-        super().show()
+
+    def next_q(self):
         self.questionID, self.question_label["text"], _, self.correctAnswer = next(self.questions) #create variables, which asks Database for next question, the database is going to provide
         #data as a tuple, and we unpack it into the empty variables. ",_," means like an empty variable, which dont want to use it.
 
@@ -55,9 +54,31 @@ class Hangman(Page):
         for i in range(6):
             incorrect = StringVar()
             incorrect.set("_")
-            GridLabel(self, textvariable = incorrect, pos=(4, 18+i))
+            GridLabel(self, textvariable=incorrect, pos=(4, 18+i))
             self.incorrect_letter_space.append(incorrect)
 
+
+        ###IMAGE ####
+        image = Image.open(f"./src/image{6-self.lives}.png")
+        image = image.resize((200, 200))
+        imagetk = ImageTk.PhotoImage(image)
+        self.canvas["image"] = imagetk # this actually puts image into the space.
+
+        self.canvas.image = imagetk #This solves the problem of disappearing image, saves a refrence to the actual image.
+
+        #refresh the skip button back to its original text value "Skip button" not "next question button"
+        self.skip_button.configure(text="Skip")
+        self.skip_button.grid(columnspan=2) # fixes layout issue
+        self.end_quiz_button.show()
+        self.restart_button.show()
+        self.time["textvariable"] = self.mainUI.timer #Unfreezes the timer
+
+        for button in self.buttons: button.configure(state=NORMAL) #UNFREEZE BUTTONS
+
+    def show(self):
+        super().show()
+        self.questions = HangmanDB.get_hangman_qs(True)  # randomly retrieve Hangman QUestions from the backend
+        self.next_q()
 
         ###IMAGE ####
         image = Image.open(f"./src/image{6-self.lives}.png")
@@ -106,8 +127,8 @@ class Hangman(Page):
 
                 self.skip_button["text"] = "Next Question"
                 self.skip_button.grid(columnspan=8) # fixes layout issue
-                self.end_quiz_button.grid_forget()
-                self.restart_button.grid_forget()
+                self.end_quiz_button.hide()
+                self.restart_button.hide()
                 self.time["textvariable"] = self.mainUI.timer.get()
 
 

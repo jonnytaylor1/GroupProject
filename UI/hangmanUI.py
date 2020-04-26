@@ -9,6 +9,7 @@ from UI.hoverButton import HoverButton
 from UI.components.timerlabel import TimerLabel
 from Quiz.statistics import Statistics
 from datetime import datetime
+from UI.quizSession import Vars
 
 class Hangman(Page):
         # root.tag_raise(canvas)
@@ -17,7 +18,7 @@ class Hangman(Page):
         self.question = GridLabel(self, text = "Question 1: ", pos=(1, 5))
         self.question_label = GridLabel(self, text = "What does the fox say? ", pos=(2, 5))
         GridLabel(self, text = "Time Elapsed ", pos=(2, 6))
-        self.time = TimerLabel(self, mainUI=self.mainUI, pos=(2, 7))  #takes a string variable created in main UI, it tracks the timer.
+        self.timer = TimerLabel(self, mainUI=self.mainUI, pos=(2, 7))  #takes a string variable created in main UI, it tracks the timer.
 
         self.correctUnderscore = StringVar()
         self.correctLetters = GridLabel(self, textvariable=self.correctUnderscore, pos=(4, 7), cspan=8) #Because the variable constantly changes, Label updates accordingly.
@@ -42,10 +43,11 @@ class Hangman(Page):
         self.canvas = GridLabel(self, pos=(4, 1), rspan=11, cspan=5)
 
     def next_q(self):
-
-        self.questionID, self.question_label["text"], _, self.correctAnswer = next(self.questions) #create variables, which asks Database for next question, the database is going to provide
-        #data as a tuple, and we unpack it into the empty variables. ",_," means like an empty variable, which dont want to use it.
-
+        try:
+            self.questionID, self.question_label["text"], _, self.correctAnswer = next(self.questions) #create variables, which asks Database for next question, the database is going to provide
+            #data as a tuple, and we unpack it into the empty variables. ",_," means like an empty variable, which dont want to use it.
+        except StopIteration:
+            self.go_to("Welcome")()
         self.lives = 6
 
         ################# CORRECT LETTERS #########################
@@ -72,7 +74,7 @@ class Hangman(Page):
         self.skip_button.grid(columnspan=2) # fixes layout issue
         self.end_quiz_button.show()
         self.restart_button.show()
-        self.time.start() #Unfreezes the timer
+        self.timer.start() #Unfreezes the timer
 
         for button in self.buttons: button.configure(state=NORMAL) #UNFREEZE BUTTONS
 
@@ -112,7 +114,7 @@ class Hangman(Page):
             self.skip_button.grid(columnspan=8) # fixes layout issue
             self.end_quiz_button.hide()
             self.restart_button.hide()
-            self.time.pause()
+            self.timer.pause()
             self.is_done = True
 
 #######################_____________________________   S T A T I S T I C S __________________________##########################
@@ -122,7 +124,7 @@ class Hangman(Page):
                 id=self.questionID,
                 quiz_format="Hangman",
                 status="incorrect" if self.lives==0 else "correct", # pass in either correct or incorrect status
-                time=self.time.diff, #self.time.diff returns the time displayed on the timer.
+                time=self.timer.time, #self.timer.time returns the time displayed on the timer.
                 created_at=datetime.now(),
             )
 
@@ -132,7 +134,7 @@ class Hangman(Page):
             id=self.questionID,
             quiz_format="Hangman",
             status="abandoned",
-            time=self.time.diff, #self.time.diff returns the time displayed on the timer.
+            time=self.timer.time, #self.timer.time returns the time displayed on the timer.
             created_at=datetime.now(),
         )
         self.show() #loads the page again.
@@ -142,7 +144,7 @@ class Hangman(Page):
             id=self.questionID,
             quiz_format="Hangman",
             status="abandoned",
-            time=self.time.diff, #self.time.diff returns the time displayed on the timer.
+            time=self.timer.time, #self.timer.time returns the time displayed on the timer.
             created_at=datetime.now(),
         )
         self.go_to("Welcome")()
@@ -152,7 +154,7 @@ class Hangman(Page):
          id=self.questionID,
          quiz_format="Hangman",
          status="skipped", # pass in either correct or incorrect status
-         time=self.time.diff, #self.time.diff returns the time displayed on the timer.
+         time=self.timer.time, #self.timer.time returns the time displayed on the timer.
          created_at=datetime.now(),
          )
         self.next_q()

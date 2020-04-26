@@ -6,7 +6,8 @@ from .betterEntry import BetterEntry, BetterText
 from .hoverButton import HoverButton
 from .usefulLabel import GridLabel
 from .page import Page
-from .multiple_choice import MultipleChoice, EndScreen
+from .multiple_choice import MultipleChoice
+from .endscreen import EndScreen
 from .settings import Settings
 from .welcome import Welcome
 from .packages import PackageMenu

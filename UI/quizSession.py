@@ -97,5 +97,5 @@ class Question():
 
     def save_stats(self):
         self.stopped_at = datetime.now()
-        Statistics.save_answer_stats(id=self.id, quiz_format="Mulit-Choice",
+        Statistics.save_answer_stats(id=self.id, quiz_format="Multi-Choice",
             status=self.status, time=self.get_time(), created_at=self.stopped_at)

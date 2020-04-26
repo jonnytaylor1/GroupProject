@@ -15,6 +15,9 @@ class Hangman(Page):
         GridLabel(self, text = "Time Elapsed ", pos=(2,6))
         self.time = GridLabel(self, textvariable=self.mainUI.timer, pos=(2, 7))  #takes a string variable created in main UI, it tracks the timer.
 
+        self.correctUnderscore = StringVar()
+        self.correctLetters = GridLabel(self, textvariable=self.correctUnderscore, pos=(4, 7), cspan=8) #Because the variable constantly changes, Label updates accordingly.
+
         self.buttons= []
         for i, letter in enumerate("ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
             b = HoverButton(self, text=letter, command=lambda x=i: self.click_letter(x), pos=(5 + i // 8, 7 + i % 8 + 3 * (i // 24)))
@@ -45,10 +48,9 @@ class Hangman(Page):
 
         ################# CORRECT LETTERS #########################
         self.underscores = ["_"] * len(self.correctAnswer)
-        self.correctUnderscore = StringVar()
         self.correctUnderscore.set(self.underscores) #each time update the uderscore variable, we need to do .set()
 
-        self.correctLetters = GridLabel(self, textvariable=self.correctUnderscore, pos=(4, 7), cspan=8) #Because the variable constantly changes, Label updates accordingly.
+
 
         self.incorrect_letter_space = []
         for i in range(6):

@@ -17,7 +17,7 @@ class TimerLabel(EasyGrid, Label):
     def update(self):
         self.diff = self.mainUI.clock - self.start_time
         secs = self.diff.seconds % 60
-        mins = secs // 60
+        mins = self.diff.seconds // 60
         self.displayed_time.set(f"{mins if mins > 9 else '0' + str(mins)}:{secs if secs > 9 else '0' + str(secs)}.{str(self.diff.microseconds)[0]}")
 
     def pause(self):

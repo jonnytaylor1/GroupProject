@@ -47,6 +47,16 @@ class Statistics():
                 (?, ?, ?, ?, ?)
                 ''', (obj["id"], obj["quiz_format"], obj["status"], obj["time"], datetime.datetime.now()))
 
+    def save_answer_stats(*, id, quiz_format, status, time, created_at):
+        with Connection() as con:
+            with con:
+                con.execute('''
+                INSERT INTO answer_stats
+                (question_id, quiz_format, status, time, created_at)
+                VALUES
+                (?, ?, ?, ?, ?)
+                ''', (str(id), quiz_format, status, str(time), created_at))
+
 
     # def update_answer_stats(obj):
     #     with Connection() as con:

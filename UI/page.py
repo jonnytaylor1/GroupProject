@@ -6,17 +6,27 @@ class Page(Frame):
         self.mainUI = mainUI
         self.created = False
 
-    def show(self):
+    def before_leaving(self):
+        self.grid_forget()
+        try: self.scrollbar.grid_forget()
+        except: pass
+
+    def create(self): pass
+
+    def before_showing(self): pass
+
+    def show(self, *args, **kwargs):
         try:
-            self.mainUI.curr_page.grid_forget()
+            self.mainUI.curr_page.before_leaving()
             self.mainUI.prev_page = self.mainUI.curr_page
-        except: pass
+        except AttributeError: pass
         self.mainUI.curr_page = self
-        self.grid(row=0, column=0, sticky=NSEW)
-        self.created = True
-        try:
+        if not self.created:
             self.create()
-        except: pass
+        self.before_showing(*args, **kwargs)
+        self.created = True
+        self.grid(row=0, column=0, sticky=NSEW)
+        self.mainUI.update_window_size()
         return self
 
     def go_to(self, page):

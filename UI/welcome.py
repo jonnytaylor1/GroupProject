@@ -3,8 +3,6 @@ from UI import *
 
 # This is a start page for the program
 class Welcome(Page):
-    def __init__(self, mainUI):
-        super().__init__(mainUI)
 
     def show(self):
         super().show()

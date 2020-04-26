@@ -1,4 +1,4 @@
-from random import shuffle
+from random import shuffle, sample
 from data.connection import Connection
 from Quiz.statistics import Statistics
 
@@ -136,5 +136,27 @@ class Multiplechoice():
             choices = [question["correct"]] + question["incorrect"]
             shuffle(choices)
             yield (question["id"], question["text"], choices, question["correct"])
+
+
+    def get_quiz_questions(quiz="Multi-Choice"):
+        bank = []
+        with Connection() as con:
+            with con:
+                for row in con.execute('''
+                            SELECT
+                            id,
+                            question,
+                            correct,
+                            incorrect1,
+                            incorrect2,
+                            incorrect3
+                            FROM questions
+                            INNER JOIN packages
+                            ON questions.package_id = packages.package_id
+                            WHERE packages.quiz_format = ?
+                ''', (str(quiz),)):
+                    bank.append(row)
+                        # {"id": row[0], "text": row[1], "correct": row[2], "incorrect": [row[3], row[4], row[5]]}
+        return sample(bank, len(bank))
 
 

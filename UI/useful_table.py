@@ -22,6 +22,8 @@ class UsefulTable(Frame):
         self.matrix = []
         self._data = "hoho"
 
+        self.parent.parent.mainUI.bind("<Configure>", lambda: print("resized"))
+
     def add_column(self, *, h_constructor, cell_constructor, property):
         heading = h_constructor(self.headingsFrame)
         self.cell_constructors.append(cell_constructor)

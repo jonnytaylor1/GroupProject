@@ -7,6 +7,9 @@ from UI.page import Page
 from UI.usefulLabel import GridLabel
 from UI.hoverButton import HoverButton
 from UI.components.timerlabel import TimerLabel
+from Quiz.statistics import Statistics
+from datetime import datetime
+
 class Hangman(Page):
         # root.tag_raise(canvas)
     def create(self):
@@ -26,10 +29,10 @@ class Hangman(Page):
 
         GridLabel(self, text = "", pos=(9, 7))
 
-        self.skip_button = HoverButton(self, text="Skip", command=self.next_q, pos=(10, 7, E), cspan=2) #everything with self.... in order to be able to reuse later.
-        self.restart_button = HoverButton(self, text="Restart", command=self.show, pos=(10, 9), cspan=3) #runs refresh() no parenthesis though, otherwise runs immediatley not when pressed
+        self.skip_button = HoverButton(self, text="Skip", command=self.skip_q, pos=(10, 7, E), cspan=2) #everything with self.... in order to be able to reuse later.
+        self.restart_button = HoverButton(self, text="Restart", command=self.restart_quiz, pos=(10, 9), cspan=3) #runs refresh() no parenthesis though, otherwise runs immediatley not when pressed
 
-        self.end_quiz_button = HoverButton(self, text="End Quiz", command=self.go_to("Welcome"), pos=(10, 12, W), cspan=3)
+        self.end_quiz_button = HoverButton(self, text="End Quiz", command=self.end_quiz, pos=(10, 12, W), cspan=3)
         # image = PhotoImage(file="image1.png")
 
         #INCORRECT LABEL##
@@ -39,11 +42,11 @@ class Hangman(Page):
         self.canvas = GridLabel(self, pos=(4, 1), rspan=11, cspan=5)
 
     def next_q(self):
+
         self.questionID, self.question_label["text"], _, self.correctAnswer = next(self.questions) #create variables, which asks Database for next question, the database is going to provide
         #data as a tuple, and we unpack it into the empty variables. ",_," means like an empty variable, which dont want to use it.
 
         self.lives = 6
-        self.mainUI.clock1 = time.time() # reset the clock provided from Main UI
 
         ################# CORRECT LETTERS #########################
         self.underscores = ["_"] * len(self.correctAnswer)
@@ -100,23 +103,56 @@ class Hangman(Page):
             imagetk = ImageTk.PhotoImage(image)
             self.canvas["image"] = imagetk
             self.canvas.image = imagetk
-            if self.lives == 0:
-                for button in self.buttons:
-                    button.configure(state=DISABLED)
+        if self.lives == 0 or self.correctAnswer.lower() == "".join(self.underscores).lower().replace("_"," "): #Making sure that the answer of the question is equal to our list of correct LETTERS
+        #the correct letters are inside a lsit, which we concatinate into a single string with an underscore in the middle, then repalce the underscore with a sapce to match the answer.
+            for button in self.buttons:
+                button.configure(state=DISABLED)
 
-                self.skip_button.configure(text="Next Question")
-                self.skip_button.grid(columnspan=8) # fixes layout issue
-                self.end_quiz_button.hide()
-                self.restart_button.hide()
-                self.time.pause()
+            self.skip_button.configure(text="Next Question")
+            self.skip_button.grid(columnspan=8) # fixes layout issue
+            self.end_quiz_button.hide()
+            self.restart_button.hide()
+            self.time.pause()
+            self.is_done = True
+
+#######################_____________________________   S T A T I S T I C S __________________________##########################
+
+            #WHEN ANSWERED:
+            Statistics.save_answer_stats(
+                id=self.questionID,
+                quiz_format="Hangman",
+                status="incorrect" if self.lives==0 else "correct", # pass in either correct or incorrect status
+                time=self.time.diff, #self.time.diff returns the time displayed on the timer.
+                created_at=datetime.now(),
+            )
 
 
+    def restart_quiz(self):
+        Statistics.save_answer_stats(
+            id=self.questionID,
+            quiz_format="Hangman",
+            status="abandoned",
+            time=self.time.diff, #self.time.diff returns the time displayed on the timer.
+            created_at=datetime.now(),
+        )
+        self.show() #loads the page again.
 
-        ##### iF INCORRECT LETTER #####
+    def end_quiz(self):
+        Statistics.save_answer_stats(
+            id=self.questionID,
+            quiz_format="Hangman",
+            status="abandoned",
+            time=self.time.diff, #self.time.diff returns the time displayed on the timer.
+            created_at=datetime.now(),
+        )
+        self.go_to("Welcome")()
 
-
-
-
-
-        # imagetk = ImageTk.PhotoImage(image)
-        # imagesprite = canvas.create_image(0,0,image=imagetk, anchor = NW)
+    def skip_q(self):
+        Statistics.save_answer_stats(
+         id=self.questionID,
+         quiz_format="Hangman",
+         status="skipped", # pass in either correct or incorrect status
+         time=self.time.diff, #self.time.diff returns the time displayed on the timer.
+         created_at=datetime.now(),
+         )
+        self.next_q()

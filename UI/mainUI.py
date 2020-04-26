@@ -11,6 +11,7 @@ class MainUI():
         self.root = Tk()
         self.root.title("Quiz")
         self.root.geometry("750x750")
+        self.root.minsize(500, 500)
 
         self.timer = StringVar()
         self.clock1 = time.time()
@@ -46,11 +47,11 @@ class MainUI():
         self.root.after(100, self.update_clock)
 
 
-    def update_window_size(self, frame):
+    def update_window_size(self):
         self.root.update()
-        height = frame.winfo_reqheight()
-        width = frame.winfo_reqwidth()
-        self.root.geometry(f'{width + 20}x{height}')
+        height = max(self.root.winfo_reqheight(), self.root.winfo_height())
+        width = max(self.root.winfo_reqwidth(), self.root.winfo_width())
+        self.root.geometry(f'{width}x{height}')
 
     def run(self):
         self.root.mainloop()

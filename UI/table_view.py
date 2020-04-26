@@ -1,7 +1,7 @@
 from tkinter import *
 from UI import EasyGrid
 
-class TableView(EasyGrid, Frame):
+class TableView(Frame):
     def __init__(self, parent, root):
         super().__init__(parent)
         self.parent = parent
@@ -12,15 +12,30 @@ class TableView(EasyGrid, Frame):
         self.prop_names = []
         self.headings = []
         self.headingsFrame = Frame(self)
-        self.headingsFrame.grid(row=0, column=0, sticky=W)
+        self.headingsFrame.pack(fill=X)
         self.canvas = Canvas(self, width=500, height=200, scrollregion=(0, 0, 500, 200),
                              yscrollcommand=self.scrollbar.set)
-        self.canvas.grid(row=1, column=0, sticky=W)
+        self.canvas.pack(fill=BOTH, expand=1)
         self.scrollbar["command"] = self.canvas.yview
         self.windowFrame = Frame(self.canvas)
         self.canvas.create_window((0, 0), window=self.windowFrame, anchor=NW)
         self.cell_constructors = []
-        self.matrix = []
+
+    def start(self):
+        self.root.bind("<Configure>", self.autoresizer)
+
+    def end(self):
+        self.root.unbind("<Configure>")
+        self.scrollbar.grid_forget()
+
+    def autoresizer(self, e):
+        if (e.widget == self.root):
+            w_height = self.windowFrame.winfo_reqheight()
+            if (w_height > self.canvas.winfo_height()) and w_height > 200:
+                self.scrollbar.grid(row=0, column=1, sticky=NSEW)
+                self.canvas["scrollregion"] = (0, 0, 0, w_height)
+            else:
+                self.scrollbar.grid_forget()
 
     def add_column(self, *, title=None, h_constructor=None, cell_constructor=None, property=""):
         try:
@@ -34,7 +49,6 @@ class TableView(EasyGrid, Frame):
             self.cell_constructors.append(lambda f, id: Label(f))
         self.prop_names.append(property)
         self.columns += 1
-        self.refresh()
         return self
 
     def cell(self, *, row, column):
@@ -59,6 +73,12 @@ class TableView(EasyGrid, Frame):
         self.refresh()
 
     def display_data(self):
+        self.matrix = []
+        self.windowFrame.destroy()
+        self.windowFrame = Frame(self.canvas)
+        self.canvas.create_window((0, 0), window=self.windowFrame, anchor=NW)
+        self.start()
+
         for row_i, row in enumerate(self._data):
             dis_row = []
             self.matrix.append(dis_row)
@@ -82,20 +102,8 @@ class TableView(EasyGrid, Frame):
             self.headingsFrame.grid_columnconfigure(col_i, minsize=width)
             self.windowFrame.grid_columnconfigure(col_i, minsize=width)
 
-    def check_window_size(self):
-        self.root.update()
-        w_height = self.windowFrame.winfo_reqheight()
-        w_width = self.windowFrame.winfo_reqwidth()
-        if (w_height > 200):
-            self.scrollbar.grid(row=0, column=1, sticky=NSEW)
-            self.canvas["scrollregion"] = (0, 0, 0, w_height)
-        else:
-            self.scrollbar.grid_forget()
-        self.canvas["width"] = w_width
-
     def refresh(self):
         self.update_column_width()
-        self.check_window_size()
 
 class Cell:
     def __init__(self, contents, *, column=None, row=None):

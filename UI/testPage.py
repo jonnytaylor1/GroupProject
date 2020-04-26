@@ -1,6 +1,9 @@
 from tkinter import *
 from UI import *
 from UI.hoverButton import HoverOptionMenu
+from UI.quizSession import QuizSession
+from datetime import datetime
+import time
 
 
 class Test(Page):
@@ -10,16 +13,7 @@ class Test(Page):
 
     def show(self):
         super().show()
-        self.grid()
-        var = StringVar()
-        var.set("hohoho")
-        self.opts = OptionMenu(self, var, "hoh", "hello", "there")
-        self.opts.configure(bg ="#e8e6e6")
-        self.opts.configure(fg="#000000")
-        # self.opts.configure(selectbackground ="#a6a6a6")
-        # self.opts.configure(selectforeground="#ffffff")
-        self.opts.grid()
-
+        Button(self, text="Hello there").pack(fill=BOTH, expand=1)
 
     def click(self):
         self.hb["state"] = DISABLED

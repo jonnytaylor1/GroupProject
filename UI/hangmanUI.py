@@ -13,7 +13,7 @@ class Hangman(Page):
 
         self.question = GridLabel(self, text = "Question 1: ", pos=(1, 5))
         self.question_label = GridLabel(self, text = "What does the fox say? ", pos=(2, 5))
-        GridLabel(self, text = "Time Elapsed ", pos=(2,6))
+        GridLabel(self, text = "Time Elapsed ", pos=(2, 6))
         self.time = TimerLabel(self, mainUI=self.mainUI, pos=(2, 7))  #takes a string variable created in main UI, it tracks the timer.
 
         self.correctUnderscore = StringVar()

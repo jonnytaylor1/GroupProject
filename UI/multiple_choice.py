@@ -7,6 +7,7 @@ from Quiz.statistics import Statistics
 from UI import *
 from UI.quizSession import Vars, QuizSession
 from collections import namedtuple
+from UI.components.timerlabel import TimerLabel
 
 
 
@@ -25,9 +26,8 @@ class MultipleChoice(Page):
 
     # reset everything and load next question
     def before_question(self):
-        self.mainUI.clock1 = time.time()
-        self.mainUI.timer.set("00:00")
         self.timer.show()
+        self.timer.start()
         self.l_timer.show()
         self.b_skip.configure(text="Skip")
         if not self.session.is_finished():
@@ -42,7 +42,7 @@ class MultipleChoice(Page):
         GridLabel(self, textvariable=self.vars.q_num, pos=(0, 0, NSEW), cspan=3)
         GridLabel(self, textvariable=self.vars.prompt, pos=(1, 0, NSEW), cspan=3)
         self.l_timer = GridLabel(self, text="Time Elapsed:", pos=(2, 0, NSEW))
-        self.timer = GridLabel(self, textvariable=self.mainUI.timer, pos=(2, 1, NSEW))
+        self.timer = TimerLabel(self, mainUI=self.mainUI, pos=(2, 1, NSEW))
         self.b_skip = HoverButton(self, text="Skip", command=self.next_q, pos=(3, 0, NSEW))
         self.b_restart = HoverButton(self, text="Restart", command=self.restart, pos=(3, 1, NSEW))
         self.b_end = HoverButton(self, text="End Quiz", command=self.end_quiz, pos=(3, 2, NSEW))
@@ -57,8 +57,7 @@ class MultipleChoice(Page):
             # lock ability to choose another answer
             choice.configure(state=DISABLED)
         self.choices[i].configure(bg="green" if self.session.answer(i) else "red")
-        self.timer.hide()
-        self.l_timer.hide()
+        self.timer.pause()
         self.b_skip.configure(text="Next")
             # if not self.session.is_finished():
             # else:

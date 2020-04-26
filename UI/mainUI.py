@@ -1,6 +1,7 @@
 from tkinter import *
 from UI import *
 import time
+from datetime import datetime
 
 # this is the main controller for UI pages
 
@@ -13,8 +14,8 @@ class MainUI():
         self.root.geometry("750x750")
         self.root.minsize(500, 500)
 
-        self.timer = StringVar()
-        self.clock1 = time.time()
+        self.clock = datetime.now()
+        self.listeners = []
 
         Grid.rowconfigure(self.root, 0, weight=1)
         Grid.columnconfigure(self.root, 0, weight=1)
@@ -36,15 +37,19 @@ class MainUI():
         self.pages["Welcome"].show()
         self.update_clock()
 
+    def add_listener(self, func):
+        self.listeners.append(func)
+        return len(self.listeners) - 1
+
 
     def update_clock(self):
         # clock 2 will track real time, clock 1 will be manually changed
-        self.clock2 = time.time()
-        self.diff = self.clock2 - self.clock1
-        int_diff = int(self.diff)
-        self.timer.set(f"{int_diff // 600}{(int_diff // 60) % 10}:{(int_diff // 10) % 6}{int_diff % 10}")
-        # Updates the clock every 100 ms
-        self.root.after(100, self.update_clock)
+        self.clock = datetime.now()
+
+        for listener in self.listeners: listener()
+
+        # Updates the clock every 50 ms
+        self.root.after(50, self.update_clock)
 
 
     def update_window_size(self):

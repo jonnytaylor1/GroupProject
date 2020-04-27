@@ -85,13 +85,16 @@ class Hangman(Page):
             #data as a tuple, and we unpack it into the empty variables. ",_," means like an empty variable, which dont want to use it.
         except StopIteration:
             self.go_to("Welcome")()
+        self.count += 1
+        self.question.configure(text=f"Question {self.count}: ")
         self.lives = 6
 
         #
         # ################# CORRECT LETTERS #########################
         self.underscores = ["_"] * len(self.correctAnswer)
         self.correctUnderscore.set(self.underscores) #each time update the uderscore variable, we need to do .set()
-
+        for under in self.incorrect_letter_space:
+            under.set("_")
 
 
         ###IMAGE ####
@@ -106,6 +109,7 @@ class Hangman(Page):
 
     def show(self):
         super().show()
+        self.count = 0
         self.questions = HangmanDB.get_hangman_qs(True)  # randomly retrieve Hangman QUestions from the backend
         self.next_q()
 

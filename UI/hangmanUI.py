@@ -57,7 +57,7 @@ class Hangman(Page):
         self.correctLetters = GridLabel(self.mainFrame, textvariable=self.correctUnderscore, pos=(0, 0, NSEW)) #Because the variable constantly changes, Label updates accordingly.
 
         self.keyboard = Frame(self.mainFrame)
-        self.keyboard.grid(row=1, column=0, sticky=NSEW, columnspan=2, pady=40, padx=10)
+        self.keyboard.grid(row=1, column=0, sticky=NSEW, columnspan=2, pady=45, padx=10)
 
         self.buttons = []
         for i, letter in enumerate("ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
@@ -66,6 +66,7 @@ class Hangman(Page):
             self.keyboard.grid_rowconfigure(row, weight=1)
             self.keyboard.grid_columnconfigure(column, weight=1)
             b = HoverButton(self.keyboard, text=letter, command=lambda x=i: self.click_letter(x), pos=(i // 8, i % 8 + 3 * (i // 24), NSEW))
+            b.grid(pady=7, padx=2)
             self.buttons.append(b)
 
         self.footer = Frame(self)

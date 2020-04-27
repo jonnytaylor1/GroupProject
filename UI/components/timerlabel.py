@@ -12,7 +12,8 @@ class TimerLabel(EasyGrid, Label):
 
     def start(self):
         self.start_time = datetime.now()
-        self.id = self.mainUI.add_listener(self.update)
+        if not self.update in self.mainUI.listeners:
+            self.id = self.mainUI.add_listener(self.update)
 
     def update(self):
         self.time = self.mainUI.clock - self.start_time

@@ -8,8 +8,27 @@ from UI.hoverButton import HoverButton
 from UI.components.timerlabel import TimerLabel
 from Quiz.statistics import Statistics
 from datetime import datetime
-from UI.quizSession import create_vars, QuizSession
+from UI.quizSession import create_vars, QuizSession, Question
 from UI.components.image import Image
+from UI.endscreen import Stats, EndScreen
+from Quiz.questions import QuestionDB
+
+class HangmanSession(QuizSession): pass
+    # def fetch_questions(self):
+    #     for question in QuestionDB.get_quiz_questions(quiz=self.type):
+    #         self.questions.put(
+    #             HangmanQuestion(self.type, *question)
+    #         )
+    #     return self
+    #
+
+
+# class HangmanQuestion(Question):
+#     def __init__(self, *args):
+#         super().__init__(*args)
+#         self.lives = 6
+#         self.
+
 
 
 class Hangman(Page):
@@ -21,9 +40,9 @@ class Hangman(Page):
         self.upperFrame = Frame(self)
         self.upperFrame.grid(row=0, column=0, columnspan=3)
         self.vars = create_vars()
-        self.question = GridLabel(self.upperFrame, text = "Question 1: ", pos=(0, 0))
-        self.question_label = GridLabel(self.upperFrame, pos=(1, 0))
-        GridLabel(self.upperFrame, text = "Time Elapsed ", pos=(0, 1))
+        self.question = GridLabel(self.upperFrame, textvariable=self.vars.q_num, pos=(0, 0))
+        self.question_label = GridLabel(self.upperFrame, pos=(1, 0), textvariable=self.vars.prompt, wraplength=350)
+        GridLabel(self.upperFrame, text="Time Elapsed ", pos=(0, 1))
         self.timer = TimerLabel(self.upperFrame, mainUI=self.mainUI, pos=(0, 2))  #takes a string variable created in main UI, it tracks the timer.
 
 
@@ -79,18 +98,22 @@ class Hangman(Page):
 
 
     def next_q(self):
-        try:
-            self.questionID, self.question_label["text"], _, self.correctAnswer = next(self.questions) #create variables, which asks Database for next question, the database is going to provide
-            #data as a tuple, and we unpack it into the empty variables. ",_," means like an empty variable, which dont want to use it.
-        except StopIteration:
-            self.go_to("Welcome")()
-        self.count += 1
-        self.question.configure(text=f"Question {self.count}: ")
+        # try:
+        #     self.questionID, self.question_label["text"], _, self.correctAnswer = next(self.questions) #create variables, which asks Database for next question, the database is going to provide
+        #     #data as a tuple, and we unpack it into the empty variables. ",_," means like an empty variable, which dont want to use it.
+        # except StopIteration:
+        #     self.go_to("Welcome")()
+        if self.session.is_finished():
+            self.go_to("EndScreen")(self.session)
+        else:
+            self.session.start_question()
         self.lives = 6
+        self.question_obj = self.session.get_q()
+        self.corr = self.session.get_q().get_correct()
 
         #
         # ################# CORRECT LETTERS #########################
-        self.underscores = ["_"] * len(self.correctAnswer)
+        self.underscores = ["_"] * len(self.corr)
         self.correctUnderscore.set(self.underscores) #each time update the uderscore variable, we need to do .set()
         for under in self.incorrect_letter_space:
             under.set("_")
@@ -108,16 +131,17 @@ class Hangman(Page):
 
     def show(self):
         super().show()
-        self.count = 0
-        self.questions = HangmanDB.get_hangman_qs(True)  # randomly retrieve Hangman QUestions from the backend
+        self.session = HangmanSession(vars=self.vars, type="Hangman").fetch_questions()
+        # self.questions = HangmanDB.get_hangman_qs(True)  # randomly retrieve Hangman QUestions from the backend
         self.next_q()
 
     def click_letter(self, i):
         guessed_letter = self.buttons[i]["text"].lower()
+
         self.buttons[i].configure(state=DISABLED)
         ##### iF CORRECT LETTER #####
-        if guessed_letter in self.correctAnswer.lower():
-            for index, letter in enumerate(self.correctAnswer):
+        if guessed_letter in self.corr.lower():
+            for index, letter in enumerate(self.corr):
                 if letter.lower() == guessed_letter:
                     self.underscores[index] = letter.upper() #match index positions, assign our letter from the correct answer in the correct letters field.
             self.correctUnderscore.set(self.underscores) # after done looping, update the label all at once.
@@ -130,9 +154,13 @@ class Hangman(Page):
             self.incorrect_letter_space[-self.lives].set(guessed_letter.upper())
             self.lives -= 1
             self.hangman_image.set(path=f"./src/image{6-self.lives}.png")
-        if self.lives == 0 or self.correctAnswer.lower() == "".join(self.underscores).lower().replace("_"," "): #Making sure that the answer of the question is equal to our list of correct LETTERS
+        answer = "".join(self.underscores).upper().replace("_"," ")
+        self.vars.choices[0].set(answer)
+        if self.lives == 0 or self.corr.upper() == answer: #Making sure that the answer of the question is equal to our list of correct LETTERS
         #the correct letters are inside a lsit, which we concatinate into a single string with an underscore in the middle, then repalce the underscore with a sapce to match the answer.
-            for button in self.buttons: button.configure(state=DISABLED)
+            for button in self.buttons:
+                button.configure(state=DISABLED)
+            self.session.answer()
 
             self.skip_button.configure(text="Next Question")
             self.end_quiz_button.hide()
@@ -142,7 +170,7 @@ class Hangman(Page):
 #######################_____________________________   S T A T I S T I C S __________________________##########################
 
             #WHEN ANSWERED:
-            self.save_stats("incorrect" if self.lives==0 else "correct")
+            # self.save_stats("incorrect" if self.lives==0 else "correct")
 
     def save_stats(self, status):
         Statistics.save_answer_stats(
@@ -154,13 +182,14 @@ class Hangman(Page):
         )
 
     def restart_quiz(self):
-        self.save_stats("abandoned")
+        self.session.abandon()
         self.show() #loads the page again.
 
     def end_quiz(self):
-        self.save_stats("abandoned")
-        self.go_to("Welcome")()
+        self.session.abandon()
+        self.go_to("EndScreen")(self.session)
 
     def skip_q(self):
-        self.save_stats("skipped")
+        if self.session.ongoing_question():
+            self.session.skip()
         self.next_q()

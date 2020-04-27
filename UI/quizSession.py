@@ -27,7 +27,7 @@ class QuizSession():
     def fetch_questions(self):
         for question in QuestionDB.get_quiz_questions(quiz=self.type):
             self.questions.put(
-                Question(*question)
+                Question(self.type, *question)
             )
         return self
 
@@ -45,7 +45,7 @@ class QuizSession():
         self.abandoned_qs += 1
         self.time += self.history[-1].abandon().get_time()
 
-    def answer(self, i):
+    def answer(self, i=0):
         if self.history[-1].give_answer(
             self.vars.choices[i].get()
         ).status == "correct":
@@ -63,8 +63,11 @@ class QuizSession():
     def ongoing_question(self):
         return self.history[-1].status == "ongoing"
 
+    def get_q(self):
+        return self.history[-1]
+
 class Question():
-    def __init__(self, id, prompt, correct, incorrect1, incorrect2, incorrect3):
+    def __init__(self, quiz_format, id, prompt, correct, incorrect1, incorrect2, incorrect3):
         self.id = id
         self.prompt = prompt
         # first choice is the correct choice
@@ -73,6 +76,10 @@ class Question():
         self.answer = None
         self.started_at = None
         self.stopped_at = None
+        self.quiz_format = quiz_format
+
+    def get_correct(self):
+        return self.choices[0]
 
     def start_q(self, vars):
         self.started_at = datetime.now()
@@ -83,7 +90,7 @@ class Question():
 
     def give_answer(self, answer):
         self.answer = answer
-        if self.answer == self.choices[0]:
+        if self.answer.lower() == self.choices[0].lower():
             self.status = "correct"
         else:
             self.status = "incorrect"
@@ -109,5 +116,5 @@ class Question():
     def save_stats(self):
         self.stopped_at = datetime.now()
         Statistics.save_answer_stats(id=self.id,
-            quiz_format="Multi-Choice", status=self.status,
+            quiz_format=self.quiz_format, status=self.status,
             time=self.get_time(), created_at=self.stopped_at)

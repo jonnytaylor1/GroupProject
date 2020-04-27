@@ -5,6 +5,13 @@ from UI.easyGrid import EasyGrid
 from UI.usefulLabel import GridLabel
 from UI.hoverButton import HoverButton
 
+class Stats:
+    def __init__(self):
+        self.incorrect_qs = 0
+        self.correct_qs = 0
+        self.skipped_qs = 0
+        self.history = []
+
 
 class EndScreen(Page):
 
@@ -54,7 +61,7 @@ class HistoryResult(EasyGrid, Frame):
         for i, q in enumerate(history):
             try: l = self.rows[i]
             except:
-                l = GridLabel(self, anchor='w', justify='left', pos=(i, 0))
+                l = GridLabel(self, anchor=W,  justify='right', pos=(i, 0, W), wraplength=350)
                 self.rows.append(l)
             text = f"{i + 1}. {q.prompt} "
             if q.status == "correct":

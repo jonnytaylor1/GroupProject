@@ -81,11 +81,6 @@ class Hangman(Page):
 
 
     def next_q(self):
-        # try:
-        #     self.questionID, self.question_label["text"], _, self.correctAnswer = next(self.questions) #create variables, which asks Database for next question, the database is going to provide
-        #     #data as a tuple, and we unpack it into the empty variables. ",_," means like an empty variable, which dont want to use it.
-        # except StopIteration:
-        #     self.go_to("Welcome")()
         if self.session.is_finished():
             self.go_to("EndScreen")(self.session)
         else:
@@ -143,7 +138,6 @@ class Hangman(Page):
             for button in self.buttons:
                 button.configure(state=DISABLED)
             self.session.answer()
-
             self.skip_button.configure(text="Next Question")
             self.end_quiz_button.hide()
             self.restart_button.hide()

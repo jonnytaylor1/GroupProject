@@ -5,11 +5,16 @@ from multiprocessing import Queue
 from random import shuffle, sample
 from collections import namedtuple
 from Quiz.statistics import Statistics
+from Quiz.questions import QuestionDB
 
 Vars = namedtuple("Vars", ["q_num", "prompt", "choices"])
+def create_vars():
+    return Vars(StringVar(), StringVar(),
+                [StringVar(), StringVar(), StringVar(), StringVar()])
 
 class QuizSession():
-    def __init__(self, *, vars):
+    def __init__(self, *, vars, type="Multi-Choice"):
+        self.type = type
         self.time = 0
         self.correct_questions = 0
         self.incorrect_questions = 0
@@ -20,13 +25,16 @@ class QuizSession():
         self.vars = vars
 
     def fetch_questions(self):
-        for question in Multiplechoice.get_quiz_questions():
-            self.questions.put(Question(*question))
+        for question in QuestionDB.get_quiz_questions(quiz=self.type):
+            self.questions.put(
+                Question(*question)
+            )
         return self
 
     def start_question(self):
-        q = self.questions.get().start_q(self.vars)
-        self.history.append(q)
+        self.history.append(
+            self.questions.get().start_q(self.vars)
+        )
         self.vars.q_num.set(f"Question {len(self.history)}:")
 
     def skip(self):
@@ -38,7 +46,9 @@ class QuizSession():
         self.time += self.history[-1].abandon().get_time()
 
     def answer(self, i):
-        if self.history[-1].give_answer(self.vars.choices[i].get()).status == "correct":
+        if self.history[-1].give_answer(
+            self.vars.choices[i].get()
+        ).status == "correct":
             self.correct_questions += 1
             self.time += self.history[-1].get_time()
             return True
@@ -77,25 +87,27 @@ class Question():
             self.status = "correct"
         else:
             self.status = "incorrect"
-
         self.save_stats()
         return self
 
     def skip(self):
-        self.save_stats()
         self.status = "skipped"
+        self.save_stats()
         return self
 
     def abandon(self):
-        self.save_stats()
         self.status = "abandoned"
+        self.save_stats()
         return self
 
     def get_time(self):
-        try: return round((self.stopped_at - self.started_at).total_seconds(), 2)
-        except: return 0
+        try:
+            return round((self.stopped_at - self.started_at).total_seconds(), 2)
+        except:
+            return 0
 
     def save_stats(self):
         self.stopped_at = datetime.now()
-        Statistics.save_answer_stats(id=self.id, quiz_format="Multi-Choice",
-            status=self.status, time=self.get_time(), created_at=self.stopped_at)
+        Statistics.save_answer_stats(id=self.id,
+            quiz_format="Multi-Choice", status=self.status,
+            time=self.get_time(), created_at=self.stopped_at)

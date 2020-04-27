@@ -5,7 +5,7 @@ import tkinter.messagebox
 from Quiz.multiplechoice import Multiplechoice
 from Quiz.statistics import Statistics
 from UI import *
-from UI.quizSession import Vars, QuizSession
+from UI.quizSession import create_vars, QuizSession
 from UI.components.timerlabel import TimerLabel
 
 
@@ -13,28 +13,24 @@ from UI.components.timerlabel import TimerLabel
 class MultipleChoice(Page):
     def __init__(self, mainUI):
         super().__init__(mainUI)
-        self.vars = Vars(StringVar(), StringVar(), [StringVar(), StringVar(), StringVar(), StringVar()])
+        self.vars = create_vars()
 
     def show(self):
         super().show()
         self.mainUI.root.geometry("750x500")
         # get data on questions from the model
-        # initialize the stats for the quiz at the start
         self.session = QuizSession(vars=self.vars).fetch_questions()
         self.before_question()
 
     # reset everything and load next question
     def before_question(self):
-        self.timer.show()
         self.timer.start()
-        self.l_timer.show()
         self.b_skip.configure(text="Skip")
         if not self.session.is_finished():
             self.session.start_question()
             for choice in self.choices:
                 choice.configure(state=NORMAL, bg="#e8e6e6")
-        else:
-            self.go_to("EndScreen")(self.session)
+        else: self.go_to("EndScreen")(self.session)
 
     def create(self):
         self.autoresize_grid(rows=8, columns=3)
@@ -51,15 +47,11 @@ class MultipleChoice(Page):
             self.choices.append(b)
 
     def answer(self, i):
-
-        for choice in self.choices:
-            # lock ability to choose another answer
-            choice.configure(state=DISABLED)
+        # lock ability to choose another answer
+        for choice in self.choices: choice.configure(state=DISABLED)
         self.choices[i].configure(bg="green" if self.session.answer(i) else "red")
         self.timer.pause()
         self.b_skip.configure(text="Next")
-            # if not self.session.is_finished():
-            # else:
 
     def next_q(self):
         if self.session.ongoing_question(): self.session.skip()

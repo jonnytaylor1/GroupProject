@@ -21,19 +21,19 @@ class QuizSession():
         self.skipped_qs = 0
         self.abandoned_qs = 0
         self.history = []
-        self.questions = Queue()
+        self.questions = []
         self.vars = vars
 
     def fetch_questions(self):
         for question in QuestionDB.get_quiz_questions(quiz=self.type):
-            self.questions.put(
+            self.questions.append(
                 Question(self.type, *question)
             )
         return self
 
     def start_question(self):
         self.history.append(
-            self.questions.get().start_q(self.vars)
+            self.questions.pop(0).start_q(self.vars)
         )
         self.vars.q_num.set(f"Question {len(self.history)}:")
 
@@ -58,7 +58,7 @@ class QuizSession():
             return False
 
     def is_finished(self):
-        return self.questions.empty()
+        return len(self.questions) == 0
 
     def ongoing_question(self):
         return self.history[-1].status == "ongoing"

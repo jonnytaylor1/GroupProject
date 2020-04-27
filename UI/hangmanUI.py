@@ -13,24 +13,6 @@ from UI.components.image import Image
 from UI.endscreen import Stats, EndScreen
 from Quiz.questions import QuestionDB
 
-class HangmanSession(QuizSession): pass
-    # def fetch_questions(self):
-    #     for question in QuestionDB.get_quiz_questions(quiz=self.type):
-    #         self.questions.put(
-    #             HangmanQuestion(self.type, *question)
-    #         )
-    #     return self
-    #
-
-
-# class HangmanQuestion(Question):
-#     def __init__(self, *args):
-#         super().__init__(*args)
-#         self.lives = 6
-#         self.
-
-
-
 class Hangman(Page):
         # root.tag_raise(canvas)
     def create(self):
@@ -119,7 +101,6 @@ class Hangman(Page):
         for under in self.incorrect_letter_space:
             under.set("_")
 
-
         ###IMAGE ####
         self.hangman_image.set(path=f"./src/image{6-self.lives}.png")
         #refresh the skip button back to its original text value "Skip button" not "next question button"
@@ -132,7 +113,7 @@ class Hangman(Page):
 
     def show(self):
         super().show()
-        self.session = HangmanSession(vars=self.vars, type="Hangman").fetch_questions()
+        self.session = QuizSession(vars=self.vars, type="Hangman").fetch_questions()
         # self.questions = HangmanDB.get_hangman_qs(True)  # randomly retrieve Hangman QUestions from the backend
         self.next_q()
 
@@ -169,18 +150,6 @@ class Hangman(Page):
             self.timer.pause()
 
 #######################_____________________________   S T A T I S T I C S __________________________##########################
-
-            #WHEN ANSWERED:
-            # self.save_stats("incorrect" if self.lives==0 else "correct")
-
-    def save_stats(self, status):
-        Statistics.save_answer_stats(
-            id=self.questionID,
-            quiz_format="Hangman",
-            status=status,
-            time=self.timer.time,  # self.timer.time returns the time displayed on the timer.
-            created_at=datetime.now(),
-        )
 
     def restart_quiz(self):
         self.session.abandon()

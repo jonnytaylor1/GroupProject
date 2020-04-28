@@ -36,14 +36,17 @@ class Welcome(Page):
         super().show()
         self.mainUI.root.geometry("500x500") # decides the size of the window
 
+        m_choice ="Start multiplechoice quiz"
+        hangman_choice = "Start a game of hangman"
+        msg = "[No questions assigned]"
         if len(QuestionDB.get_quiz_questions(quiz="Hangman")) == 0:
-            self.hangman_button.configure(state=DISABLED)
+            self.hangman_button.configure(state=DISABLED, text=hangman_choice + " "+ msg)
         else:
-            self.hangman_button.configure(state=NORMAL)
+            self.hangman_button.configure(state=NORMAL, text=hangman_choice)
         if len(QuestionDB.get_quiz_questions(quiz="Multi-Choice")) == 0:
-            self.multiple_choice_button.configure(state=DISABLED)
+            self.multiple_choice_button.configure(state=DISABLED, text=m_choice + " "+ msg)
         else:
-            self.multiple_choice_button.configure(state=NORMAL)
+            self.multiple_choice_button.configure(state=NORMAL, text=m_choice)
 
 
         if self.mainUI.is_student:

@@ -47,8 +47,8 @@ class EndScreen(Page):
         self.l_total_answers = GridLabel(self, textvariable=self.stats.total_qs, pos=(3, 1))
         self.l_total_time = GridLabel(self, textvariable=self.stats.total_time, pos=(4, 1))
 
-        HoverButton(self, text="Menu", command=self.go_to("Welcome"), pos=(5, 0, NSEW))
-        HoverButton(self, text="Restart", command=self.mainUI.prev_page.show, pos=(5, 1, NSEW))
+        HoverButton(self, text="Menu", command=self.go_to("Welcome"), pos=(5, 0, NSEW), cspan=2)
+        HoverButton(self, text="Restart", command=lambda: self.mainUI.prev_page.show(), pos=(6, 0, NSEW), cspan=2)
 
         self.h_result = HistoryResult(self, pos=(0, 2))
 

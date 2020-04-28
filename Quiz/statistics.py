@@ -219,14 +219,27 @@ class Statistics():
     def get_overall_stats(self):
         self.load_stats2()
         Question = namedtuple("Question",
-                              ["currently_assigned", "q_id", "text", "correct", "in1", "in2", "in3", "times", "status",
+                              ["currently_assigned", "q_id", "text", "correct", "in1", "in2", "in3", "times", "successes", "failures", "skips", "abandons",
                                "created_at", "package_id", "package_name", "quiz"])
         def data_reducer(acc, q):
             for y in acc:
-                if(q.q_id == y.q_id and q.quiz == y.quiz):
-                    y.times.append(q.time)
+                if(q.q_id == y[1] and q.quiz == y[-1]):
+                    y[7].append(q.time)
+                    if q.status == "correct":
+                        y[8] += 1
+                    elif q.status == "incorrect":
+                        y[9] += 1
+                    elif q.status == "skipped":
+                        y[10] += 1
+                    elif q.status == "abandoned":
+                        y[11] += 1
                     return acc
-            acc.append(Question(*q[:7], [q.time], *q[8:]))
+            acc.append([*q[:7], [q.time], 0, 0, 0, 0, *q[9:]])
             return acc
 
-        return reduce(data_reducer, self.q_bank, [])
+        result = []
+
+        for q in reduce(data_reducer, self.q_bank, []):
+            result.append(Question(*q))
+
+        return result

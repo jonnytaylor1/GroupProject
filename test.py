@@ -6,6 +6,9 @@ from Quiz.statistics import Statistics
 #                                 "quiz_format": 1,
 #                                 "status": "incorrect",
 #                                 "time": 50})
-
+time = 0
 for t in Statistics().get_overall_stats():
-    print(t)
+    time += sum(t.times)
+print(time)
+
+S

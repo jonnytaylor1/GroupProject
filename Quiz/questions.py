@@ -27,3 +27,22 @@ class QuestionDB:
         return sample(bank, len(bank))
 
 
+    def get_package_questions(*, package_id):
+        bank = []
+        with Connection() as con:
+            with con:
+                for row in con.execute('''
+                            SELECT
+                            id,
+                            question,
+                            correct,
+                            incorrect1,
+                            incorrect2,
+                            incorrect3
+                            FROM questions
+                            WHERE package_id = ?
+                ''', (str(package_id),)):
+                    bank.append(row)
+        return sample(bank, len(bank))
+
+

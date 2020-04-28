@@ -3,6 +3,7 @@ import sqlite3
 from tkinter import messagebox
 from Quiz.package import Package
 from UI import *
+from Quiz.packageHelper import check_for_numbers
 
 
 class PackageMenu(Page):
@@ -48,7 +49,18 @@ class PackageMenu(Page):
 
     def assign_format(self, package_id, value):
         package_id, name, quiz_format = Package.get_package(package_id)
-        if value == "Multi-Choice" or value == "Hangman":
+
+        if value == "Hangman":
+            if check_for_numbers(package_id=package_id):
+                messagebox.showinfo("Alert",
+                                    "Cannot assign a package with numbers to Hangman")
+            else:
+                try:
+                    Package.save_package(package_id, name, value)
+                except sqlite3.IntegrityError:
+                    messagebox.showinfo("Alert",
+                                        "You can only assign one question package to a quiz at a time. Please unassign a question package before continuing")
+        elif value == "Multi-Choice":
             try:
                 Package.save_package(package_id, name, value)
             except sqlite3.IntegrityError:

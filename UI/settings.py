@@ -1,6 +1,7 @@
 from tkinter import *
 from UI import *
 from Quiz.multiplechoice import Multiplechoice
+from UI.components.Validator import field_checker
 # create Settings UI for the quiz
 class Settings(Page):
 
@@ -31,9 +32,14 @@ class Settings(Page):
 
 
     def save_q(self):
-        Multiplechoice.save_question(self.question["id"], self.question["text"].get("1.0", END).rstrip(), self.question["correct"].get(),
-                                     self.question["in1"].get(), self.question["in2"].get(), self.question["in3"].get())
+        id = self.question["id"]
+        prompt = self.question["text"].get("1.0", END).rstrip()
+        correct = self.question["correct"].get()
+        in1 = self.question["in1"].get()
+        in2 = self.question["in2"].get()
+        in3 = self.question["in3"].get()
 
+        field_checker(prompt, correct, in1, in2, in3, f_commiter=lambda: Multiplechoice.save_question(id, prompt, correct, in1, in2, in3))
         self.show()
 
     # send edit form to the database
@@ -60,10 +66,19 @@ class Settings(Page):
 
         # create a new question in the database
         def send_q_data(self):
-            Multiplechoice.create_question(prompt=self.prompt.get("1.0", END).rstrip(),
-                                           answer=self.correct.get(), incorrect1=self.incorrect1.get(),
-                                           incorrect2=self.incorrect2.get(), incorrect3=self.incorrect3.get(),
-                                           package_id=self.page.package_id)
+            prompt = self.prompt.get("1.0", END).rstrip()
+            answer = self.correct.get()
+            in1 = self.incorrect1.get()
+            in2 = self.incorrect2.get()
+            in3 = self.incorrect3.get()
+            p_id=self.page.package_id
+
+            field_checker(prompt, answer, in1, in2, in3, f_commiter=lambda:
+                            Multiplechoice.create_question(prompt=prompt, answer=answer, incorrect1=in1,
+                                           incorrect2=in2, incorrect3=in3, package_id=p_id)
+                          )
+
+
             self.grid_forget()
             self.page.b_add.configure(text="Add new Question", command=self.page.new_q_form)
             self.page.show()
@@ -109,6 +124,7 @@ class Settings(Page):
         self.question["in3"].set(inc3)
 
         self.mainUI.update_window_size()
+
 
 
     def before_showing(self, package_id=None):

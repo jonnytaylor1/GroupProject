@@ -11,8 +11,12 @@ class Welcome(Page):
 
         if len(QuestionDB.get_quiz_questions(quiz="Hangman")) == 0:
             self.hangman_button.configure(state=DISABLED)
+        else:
+            self.hangman_button.configure(state=NORMAL)
         if len(QuestionDB.get_quiz_questions(quiz="Multi-Choice")) == 0:
             self.multiple_choice_button.configure(state=DISABLED)
+        else:
+            self.multiple_choice_button.configure(state=NORMAL)
 
 
     def create(self):

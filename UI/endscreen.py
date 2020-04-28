@@ -4,6 +4,7 @@ from UI.page import Page
 from UI.easyGrid import EasyGrid
 from UI.usefulLabel import GridLabel
 from UI.hoverButton import HoverButton
+from itertools import zip_longest
 
 class Stats:
     def __init__(self):
@@ -58,20 +59,23 @@ class HistoryResult(EasyGrid, Frame):
         self.rows = []
 
     def set(self, *, history):
-        for i, q in enumerate(history):
-            try: l = self.rows[i]
-            except:
-                l = GridLabel(self, anchor=W,  justify='right', pos=(i, 0, W), wraplength=350)
-                self.rows.append(l)
-            text = f"{i + 1}. {q.prompt} "
-            if q.status == "correct":
-                l.configure(fg="green")
-                text += f"{q.choices[0]}."
-            elif q.status == "incorrect":
-                l.configure(fg="red")
-                text += f"{q.answer}. (Correct: {q.choices[0]})"
-            elif q.status == "skipped" or "abandoned":
-                l.configure(fg="grey")
-                text += f"Skipped. (Correct: {q.choices[0]})"
-            text += f" Time spent: {q.get_time()}s"
-            l.configure(text=text)
+        for i, (q, row) in enumerate(zip_longest(history, self.rows)):
+            if not q:
+                row.hide()
+            elif not row:
+                row = GridLabel(self, anchor=W,  justify='right', pos=(i, 0, W), wraplength=350)
+                self.rows.append(row)
+
+            if q:
+                text = f"{i + 1}. {q.prompt} "
+                if q.status == "correct":
+                    row.configure(fg="green")
+                    text += f"{q.choices[0]}."
+                elif q.status == "incorrect":
+                    row.configure(fg="red")
+                    text += f"{q.answer}. (Correct: {q.choices[0]})"
+                elif q.status == "skipped" or "abandoned":
+                    row.configure(fg="grey")
+                    text += f"Skipped. (Correct: {q.choices[0]})"
+                text += f" Time spent: {q.get_time()}s"
+                row.configure(text=text)

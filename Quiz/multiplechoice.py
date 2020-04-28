@@ -1,4 +1,4 @@
-from random import shuffle
+from random import shuffle, sample
 from data.connection import Connection
 from Quiz.statistics import Statistics
 
@@ -70,15 +70,12 @@ class Multiplechoice():
         with Connection() as con:
             con.execute("CREATE TABLE IF NOT EXISTS questions (id INTEGER PRIMARY KEY, question TEXT, correct TEXT, incorrect1 TEXT, incorrect2 TEXT, incorrect3 TEXT, package_id INTEGER, FOREIGN KEY (package_id) REFERENCES packages (package_id))")
 
-    def add_question(q):
-        b, c, d = q["incorrect"]
-        id = 0
+    def create_question(*, prompt, answer, incorrect1, incorrect2, incorrect3, package_id):
         with Connection() as con:
             with con:
-                y = con.execute("INSERT INTO questions(question, correct, incorrect1, incorrect2, incorrect3, package_id) values (?,?,?,?,?,?)", (q["text"], q["correct"], b, c, d, q["package_id"]))
-                id = y.lastrowid
-        Statistics.create_stats(id)
-
+                con.execute("INSERT INTO questions(question, correct, "+
+                            "incorrect1, incorrect2, incorrect3, package_id) values (?,?,?,?,?,?)",
+                            (prompt, answer, incorrect1, incorrect2, incorrect3, package_id))
 
 
     def get_questions(self, random = False):
@@ -139,5 +136,27 @@ class Multiplechoice():
             choices = [question["correct"]] + question["incorrect"]
             shuffle(choices)
             yield (question["id"], question["text"], choices, question["correct"])
+
+
+    def get_quiz_questions(quiz="Multi-Choice"):
+        bank = []
+        with Connection() as con:
+            with con:
+                for row in con.execute('''
+                            SELECT
+                            id,
+                            question,
+                            correct,
+                            incorrect1,
+                            incorrect2,
+                            incorrect3
+                            FROM questions
+                            INNER JOIN packages
+                            ON questions.package_id = packages.package_id
+                            WHERE packages.quiz_format = ?
+                ''', (str(quiz),)):
+                    bank.append(row)
+                        # {"id": row[0], "text": row[1], "correct": row[2], "incorrect": [row[3], row[4], row[5]]}
+        return sample(bank, len(bank))
 
 

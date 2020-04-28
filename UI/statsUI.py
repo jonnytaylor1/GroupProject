@@ -7,6 +7,8 @@ from matplotlib.figure import Figure
 
 from typing import List
 
+from UI import *
+
 # this function returns a list of named tuples that have question info and statistics
 from Quiz.statistics import Statistics as StatDB
 
@@ -134,14 +136,13 @@ class BottomButtons(Frame):
         self.button_two.grid(row=3, column=1, sticky="w")
 
 
-class Statistics(Frame):
+class Statistics(Page):
     """This class provides the statistics view, in table and graphical form"""
 
-    def __init__(self, parent):
-        Frame.__init__(self, parent.root)
-        self.parent = parent
+    def __init__(self, mainUI):
+        super().__init__(mainUI)
         self.columnconfigure(0, weight=1)
-        self.back_button = Button(self, text="< Back", command=self.back)
+        self.back_button = Button(self, text="< Back", command=lambda: self.go_to("Welcome")())
         self.back_button.grid(row=1, padx=(10, 0), pady=(10, 5), sticky="w")
 
         # hide border
@@ -162,6 +163,3 @@ class Statistics(Frame):
         self.buttons = BottomButtons(self)
         self.buttons.grid(row=3, sticky="n")
 
-    def back(self):
-        self.grid_forget()
-        self.parent.pages["Welcome"].show()

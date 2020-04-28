@@ -3,7 +3,7 @@ from tkinter import *
 
 class UsefulTable(Frame):
     def __init__(self, parent):
-        Frame.__init__(self, parent.root)
+        super().__init__(parent.root)
         self.parent = parent
         self.scrollbar = Scrollbar(self.parent.root, orient="vertical")
         self.scrollbar.grid_forget()
@@ -21,6 +21,8 @@ class UsefulTable(Frame):
         self.cell_constructors = []
         self.matrix = []
         self._data = "hoho"
+
+        self.parent.parent.mainUI.bind("<Configure>", lambda: print("resized"))
 
     def add_column(self, *, h_constructor, cell_constructor, property):
         heading = h_constructor(self.headingsFrame)

@@ -1,20 +1,20 @@
 from tkinter import *
 from UI import *
+from UI.hoverButton import HoverOptionMenu
+from UI.quizSession import QuizSession
+from datetime import datetime
+import time
 
 
+class Test(Page):
 
-class Test(Frame):
-
-    def __init__(self, parent):
-        Frame.__init__(self, parent.root)
-        self.parent = parent
+    def __init__(self, mainUI):
+        super().__init__(mainUI)
 
     def show(self):
-        self.grid()
-        self.hb = HoverButton(self, text="click me", command=self.click)
-        self.hb.grid()
+        super().show()
+        Button(self, text="Hello there").pack(fill=BOTH, expand=1)
 
     def click(self):
         self.hb["state"] = DISABLED
         self.hb["bg"] = "green"
-        print(ttk.Widget.__subclasses__())

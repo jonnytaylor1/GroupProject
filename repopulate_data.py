@@ -53,6 +53,6 @@ for package in data:
         p_id = Package.add_package(p_name)
         Package.save_package(p_id, p_name, types[counter])
         for text, correct, in1, in2, in3 in qs:
-            Multiplechoice.add_question({"correct": correct, "text": text, "incorrect": [in1, in2, in3], "package_id": p_id})
+            Multiplechoice.create_question(answer=correct, prompt=text, incorrect1=in1, incorrect2=in2, incorrect3=in3, package_id=p_id)
 
 

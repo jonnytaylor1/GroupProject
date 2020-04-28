@@ -234,6 +234,8 @@ class Statistics():
                     elif q.status == "abandoned":
                         y[11] += 1
                     return acc
+            if type(q.time) == str:
+                print(q)
             acc.append([*q[:7], [q.time], 0, 0, 0, 0, *q[9:]])
             return acc
 

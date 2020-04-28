@@ -8,4 +8,4 @@ from Quiz.statistics import Statistics
 #                                 "time": 50})
 
 for t in Statistics().get_overall_stats():
-    print(t)
+    pass

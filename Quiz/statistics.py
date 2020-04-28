@@ -209,7 +209,8 @@ class Statistics():
                 INNER JOIN packages
                 ON questions.package_id = packages.package_id)
                 ''')):
-                    self.q_bank.append(Question(row[-1] == row[-2],*row[:-1]))
+                    if not type(row[6]) == str:
+                        self.q_bank.append(Question(row[-1] == row[-2],*row[:-1]))
 
 
     def get_overall_stats_old(self):
@@ -234,8 +235,7 @@ class Statistics():
                     elif q.status == "abandoned":
                         y[11] += 1
                     return acc
-            if type(q.time) == str:
-                print(q)
+
             acc.append([*q[:7], [q.time], 0, 0, 0, 0, *q[9:]])
             return acc
 

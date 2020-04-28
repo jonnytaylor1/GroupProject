@@ -31,10 +31,13 @@ class MainUI():
                       "EndScreen": EndScreen(self),
                       "Statistics": Statistics(self),
                       "Hangman": Hangman(self),
-                      "Test": Test(self)}
+                      "Test": Test(self),
+                      "Login": LoginPage(self),
+                      "ChooseVer": UserTypePage(self),
+                      "SettingsMenu": SettingsPage(self)}
 
         # this is the first page to show
-        self.pages["Welcome"].show()
+        self.pages["ChooseVer"].show()
         self.update_clock()
 
     def add_listener(self, func):

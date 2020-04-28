@@ -14,4 +14,7 @@ from .packages import PackageMenu
 from .statsUI import Statistics
 from .hangmanUI import Hangman
 from .testPage import Test
+from .loginPage import LoginPage
+from .checkUserTypePage import UserTypePage
+from .settingsPage import SettingsPage
 

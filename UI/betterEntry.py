@@ -32,6 +32,11 @@ class BetterEntry(EasyGrid, Entry):
         else:
             return super().get()
 
+    def clear(self):
+        self.delete(0, END)
+        self.placeholder = False
+        self.on_typing("jk")
+
 class BetterText(EasyGrid, Text):
     def __init__(self, *args, bgText, **kwargs):
         super().__init__(*args, fg="grey", **kwargs)

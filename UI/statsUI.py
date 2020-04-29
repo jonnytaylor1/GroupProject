@@ -179,18 +179,25 @@ class PackageView(Frame):
             plots[i].spines['top'].set_visible(False)
         times_x = [j.q_id for j in self.stats_table.data]
         times_y = [j.times for j in self.stats_table.data]
-        plots[0].boxplot(times_y, showfliers=False, positions=times_x)
+        boxplot = plots[0].boxplot(times_y, showfliers=False, positions=times_x, patch_artist=True)
         plots[0].set_ylabel("Time to answer (s)")
+        colors = ['pink', 'lightblue', 'lightgreen']
+        for patch in boxplot['boxes']:
+            patch.set_facecolor("deepskyblue")
         success_x = [j.q_id for j in self.stats_table.data]
         success_y = [(j.successes / total_times_shown(j)) * 100 for j in self.stats_table.data]
-        plots[1].bar(success_x, success_y)
+        plots[1].bar(success_x, success_y, color="mediumseagreen", label="accuracy")
         plots[1].set_xticks(success_x)
-        plots[1].set_ylabel("% answered correctly")
+        plots[1].set_ylabel("% answered accurately")
+        plots[1].legend()
         skip_x = [j.q_id for j in self.stats_table.data]
         skip_y = [(j.skips / total_times_shown(j)) * 100 for j in self.stats_table.data]
-        plots[2].bar(skip_x, skip_y)
+        abandon_y = [(j.abandons / total_times_shown(j)) * 100 for j in self.stats_table.data]
+        plots[2].bar(skip_x, skip_y, label="skipped")
+        plots[2].bar(skip_x, abandon_y, bottom=skip_y, label="abandoned")
         plots[2].set_xticks(skip_x)
-        plots[2].set_ylabel("% abandoned")
+        plots[2].set_ylabel("% skipped/abandoned")
+        plots[2].legend()
         self.fig.tight_layout()
         self.canvas.draw()
 

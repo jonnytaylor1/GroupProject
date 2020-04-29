@@ -18,6 +18,7 @@ StatsCol = namedtuple("StatsCol", ["name", "heading", "type", "width", "anchor"]
 class StatsData:
     data = [data for data in StatDB().get_overall_stats()]
     dates = {q.created_at.date().isoformat(): q.created_at.date() for q in data}
+    print(dates)
 
     @classmethod
     def available_dates(cls):

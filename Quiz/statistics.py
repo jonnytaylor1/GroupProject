@@ -209,8 +209,10 @@ class Statistics():
                 INNER JOIN packages
                 ON questions.package_id = packages.package_id)
                 ''')):
-                    if not type(row[6]) == str:
+                    if not type(row[6]) == str and row[7] != "ongoing":
                         self.q_bank.append(Question(row[-1] == row[-2],*row[:-1]))
+                    elif row[7] == "ongoing":
+                        print(row)
 
 
     def get_overall_stats_old(self):
@@ -224,7 +226,7 @@ class Statistics():
                                "created_at", "package_id", "package_name", "quiz"])
         def data_reducer(acc, q):
             for y in acc:
-                if(q.q_id == y[1] and q.quiz == y[-1]):
+                if(q.q_id == y[1] and q.quiz == y[-1] and q.created_at.date == y[-4].date):
                     y[7].append(q.time)
                     if q.status == "correct":
                         y[8] += 1
@@ -236,7 +238,16 @@ class Statistics():
                         y[11] += 1
                     return acc
 
-            acc.append([*q[:7], [q.time], 0, 0, 0, 0, *q[9:]])
+            row = [*q[:7], [q.time], 0, 0, 0, 0, *q[9:]]
+            if q.status == "correct":
+                row[8] += 1
+            elif q.status == "incorrect":
+                row[9] += 1
+            elif q.status == "skipped":
+                row[10] += 1
+            elif q.status == "abandoned":
+                row[11] += 1
+            acc.append(row)
             return acc
 
         result = []

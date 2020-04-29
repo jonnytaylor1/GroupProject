@@ -9,12 +9,11 @@ from Quiz.password import PasswordDB
 #                                 "status": "incorrect",
 #                                 "time": 50})
 # time = 0
-# for t in Statistics().get_overall_stats():
-#     time += sum(t.times)
-# print(time)
+for t in Statistics().get_overall_stats():
+    print(t)
 #
 
-PasswordDB.ensure_table_exists()
-# PasswordDB.set_password("hello there")
-
-print(PasswordDB.get_password())
+# PasswordDB.ensure_table_exists()
+# # PasswordDB.set_password("hello there")
+#
+# print(PasswordDB.get_password())

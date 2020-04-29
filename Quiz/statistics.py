@@ -226,7 +226,7 @@ class Statistics():
                                "created_at", "package_id", "package_name", "quiz"])
         def data_reducer(acc, q):
             for y in acc:
-                if(q.q_id == y[1] and q.quiz == y[-1] and q.created_at.date == y[-4].date):
+                if(q.q_id == y[1] and q.quiz == y[-1] and q.created_at.date() == y[-4].date()):
                     y[7].append(q.time)
                     if q.status == "correct":
                         y[8] += 1

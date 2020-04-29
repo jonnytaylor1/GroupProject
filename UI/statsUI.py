@@ -14,6 +14,9 @@ from Quiz.statistics import Statistics as StatDB
 
 StatsCol = namedtuple("StatsCol", ["name", "heading", "type", "width", "anchor"])
 
+def total_times_shown(question):
+    return question.successes + question.failures + question.skips + question.abandons
+
 
 class StatsData:
     data = [data for data in StatDB().get_overall_stats()]
@@ -68,7 +71,6 @@ class StatsTable(Treeview):
         self.data = StatsData.get_data(self.date, self.package, quiz)
         self.insert_data()
         # initial sort by question number after creation, just in case
-        self.sort_column(self.table_columns[0], False)
 
     def create_table(self):
         """Creates the table and sets up the headings. Should only run once"""
@@ -87,15 +89,16 @@ class StatsTable(Treeview):
 
     def insert_data(self):
         for item in self.data:
-            total_times_shown = item.successes + item.failures + item.skips + item.abandons
+            total_times = total_times_shown(item)
             self.insert("", 0, text=f"{item.q_id}",
                         values=[f"{item.q_id}",
                                 f"{item.text}",
-                                f"{total_times_shown}",
+                                f"{total_times}",
                                 f"{sum(item.times) / len(item.times):.3f} s",
-                                f"{(item.successes / total_times_shown) * 100:.1f}%",
-                                f"{(item.skips / total_times_shown) * 100:.1f}%",
-                                f"{(item.abandons / total_times_shown) * 100:.1f}%"])
+                                f"{(item.successes / total_times) * 100:.1f}%",
+                                f"{(item.skips / total_times) * 100:.1f}%",
+                                f"{(item.abandons / total_times) * 100:.1f}%"])
+        self.sort_column(self.table_columns[0], False)
 
     # https://stackoverflow.com/questions/46618459/tkinter-treeview-column-sorting
     def sort_column(self, sort_col, reverse):
@@ -155,14 +158,13 @@ class PackageView(Frame):
         self.table_scrollbar.grid(row=2, column=5, sticky="ns", padx=(0, 50), pady=(10, 5))
 
         # graph lives in a Figure
-        self.fig = Figure(figsize=(4, 2), dpi=100)
+        self.fig = Figure(figsize=(10, 2), dpi=100)
 
         # Figures are drawn on Canvases
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
-        self.canvas.draw()
         # Canvases can be added to the grid
         # FIXME: padding
-        self.canvas.get_tk_widget().grid(row=4, column=1, columnspan=1, pady=(5, 10))
+        self.canvas.get_tk_widget().grid(row=4, column=1, columnspan=5, pady=(5, 10))
         self.update_table()
 
     def update_table(self, *args):
@@ -171,10 +173,22 @@ class PackageView(Frame):
 
     def update_graph(self):
         self.fig.clear()
-        self.bar_chart = self.fig.add_subplot(xlabel="Question Number", ylabel="Test", frame_on="false")
-        x = [i.q_id for i in self.stats_table.data]
-        y = [i.abandons for i in self.stats_table.data]
-        self.bar_chart.bar(x, y)
+        plots = []
+        for i in range(1, 4):
+            plots.append(self.fig.add_subplot(1, 3, i))
+        times_x = [j.q_id for j in self.stats_table.data]
+        times_y = [j.times for j in self.stats_table.data]
+        plots[0].boxplot(times_y, showfliers=False, positions=times_x)
+        plots[0].set_title("Time to answer")
+        success_x = [j.q_id for j in self.stats_table.data]
+        success_y = [(j.successes / total_times_shown(j)) * 100 for j in self.stats_table.data]
+        plots[1].bar(success_x, success_y)
+        plots[1].set_title("% answered correctly")
+        abandon_x = [j.q_id for j in self.stats_table.data]
+        abandon_y = [(j.abandons / total_times_shown(j)) * 100 for j in self.stats_table.data]
+        plots[2].bar(abandon_x, abandon_y)
+        plots[2].set_title("% abandoned")
+
         self.canvas.draw()
 
 
@@ -212,13 +226,7 @@ class Statistics(Page):
         s = Style(self)
         s.configure('flat.TNotebook', borderwidth=0)
         self.tabbed_section = Notebook(self, style="flat.TNotebook")
-        # create frames for tabs
-        # self.quiz_one = QuizView(self.tabbed_section, 1, borderwidth=0, highlightthickness=0)
-        # self.quiz_two = QuizView(self.tabbed_section, 2)
-        # # attach tabs
-        # self.tabbed_section.add(self.quiz_one, text="Multi-Choice")
-        # self.tabbed_section.add(self.quiz_two, text="Hangman")
-        #
+
         # # FIXME: padding
         self.tabbed_section.grid(row=2, columnspan="3", padx=20, sticky="n")
         #

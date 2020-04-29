@@ -48,8 +48,6 @@ class StatsData:
 
     @classmethod
     def get_data_for_date(cls, date):
-        for q in cls.data:
-            print(f"{q.created_at.date()} - {date}")
         return [q for q in cls.data if q.created_at.date() == date]
 
 
@@ -177,18 +175,22 @@ class PackageView(Frame):
         plots = []
         for i in range(1, 4):
             plots.append(self.fig.add_subplot(1, 3, i))
+            plots[i-1].set_frame_on(FALSE)
+            print(plots[i-1])
         times_x = [j.q_id for j in self.stats_table.data]
         times_y = [j.times for j in self.stats_table.data]
         plots[0].boxplot(times_y, showfliers=False, positions=times_x)
-        plots[0].set_title("Time to answer")
+        plots[0].set_ylabel("Time to answer (s)")
         success_x = [j.q_id for j in self.stats_table.data]
         success_y = [(j.successes / total_times_shown(j)) * 100 for j in self.stats_table.data]
         plots[1].bar(success_x, success_y)
-        plots[1].set_title("% answered correctly")
-        abandon_x = [j.q_id for j in self.stats_table.data]
-        abandon_y = [(j.abandons / total_times_shown(j)) * 100 for j in self.stats_table.data]
-        plots[2].bar(abandon_x, abandon_y)
-        plots[2].set_title("% abandoned")
+        plots[1].set_xticks(success_x)
+        plots[1].set_ylabel("% answered correctly")
+        skip_x = [j.q_id for j in self.stats_table.data]
+        skip_y = [(j.skips / total_times_shown(j)) * 100 for j in self.stats_table.data]
+        plots[2].bar(skip_x, skip_y)
+        plots[2].set_xticks(skip_x)
+        plots[2].set_ylabel("% abandoned")
 
         self.canvas.draw()
 
@@ -237,8 +239,6 @@ class Statistics(Page):
 
     def update_ui(self, *args):
         new_date = StatsData.dates[self.date_to_view.get()]
-        print(f"date = {new_date}")
-        print(StatsData.packages_for_date(new_date))
         for tab in self.tabbed_section.tabs():
             self.tabbed_section.forget(tab)
 

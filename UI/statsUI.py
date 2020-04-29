@@ -1,10 +1,12 @@
 from tkinter import *
-from tkinter.ttk import Treeview, Notebook, Separator, Style
+from tkinter import filedialog
+from tkinter.ttk import Treeview, Notebook, Style
 from collections import namedtuple
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
+import csv as csv
 from typing import List
 
 from UI import *
@@ -199,11 +201,6 @@ class BottomButtons(Frame):
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        self.button = Button(self, text="Export event statistics as CSV")
-        self.button.grid(row=3, column=0, sticky="e")
-        # self.button_two = Button(self, text="Export HTML report")
-        # self.button_two.grid(row=3, column=1, sticky="w")
-
 
 class Statistics(Page):
     """This class provides the statistics view, in table and graphical form"""
@@ -231,8 +228,8 @@ class Statistics(Page):
         # # FIXME: padding
         self.tabbed_section.grid(row=2, columnspan="3", padx=20, sticky="n")
         #
-        self.buttons = BottomButtons(self)
-        self.buttons.grid(row=3, columnspan="3", pady=10, sticky="n")
+        self.button = Button(self, text="Export event statistics as CSV", command=self.csv_export)
+        self.button.grid(row=3, columnspan="3", pady=10, sticky="n")
         self.update_ui()
 
     def update_ui(self, *args):
@@ -243,3 +240,22 @@ class Statistics(Page):
         for package in StatsData.packages_for_date(new_date):
             test_tab = PackageView(self.tabbed_section, new_date, package)
             self.tabbed_section.add(test_tab, text=package)
+
+
+    def csv_export(self):
+        date = StatsData.dates[self.date_to_view.get()]
+
+        file_path = filedialog.asksaveasfilename(filetypes=(("CSV", ".csv"),), initialfile=date)
+
+        # code taken from https://docs.python.org/3/library/csv.html
+        if file_path:
+            with open(file_path, 'w', newline='') as csvfile:
+                csvwriter = csv.writer(csvfile, delimiter=',',
+                                        quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                csvwriter.writerow(("package name", "quiz", "question id", "question text",
+                                    "total times shown", "successful answers", "skips", "abandons"))
+                for package in StatsData.packages_for_date(date):
+                    for quiz in StatsData.quizzes_for_package(package, date):
+                        for q in StatsData.get_data(date, package, quiz):
+                            csvwriter.writerow((q.package_name, q.quiz, q.q_id, q.text,
+                                                total_times_shown(q), q.successes, q.skips, q.abandons))

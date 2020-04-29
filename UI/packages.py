@@ -53,7 +53,7 @@ class PackageMenu(Page):
         if value == "Hangman":
             if check_for_numbers(package_id=package_id):
                 messagebox.showinfo("Alert",
-                                    "Cannot assign a package with numbers to Hangman")
+                                    "Cannot use answers with numbers or special characters inr Hangman")
             else:
                 try:
                     Package.save_package(package_id, name, value)

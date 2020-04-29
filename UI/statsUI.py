@@ -21,7 +21,6 @@ def total_times_shown(question):
 class StatsData:
     data = [data for data in StatDB().get_overall_stats()]
     dates = {q.created_at.date().isoformat(): q.created_at.date() for q in data}
-    print(dates)
 
     @classmethod
     def available_dates(cls):
@@ -153,12 +152,11 @@ class PackageView(Frame):
         self.table_scrollbar.config(command=self.stats_table.yview)
 
         # FIXME: padding
-        self.stats_table.grid(row=2, column=1, columnspan=4, padx=(50, 0), pady=(10, 5))
-        self.table_scrollbar.grid(row=2, column=5, sticky="ns", padx=(0, 50), pady=(10, 5))
+        self.stats_table.grid(row=2, column=1, columnspan=4, padx=(50, 0), pady=(10, 20))
+        self.table_scrollbar.grid(row=2, column=5, sticky="ns", padx=(0, 50), pady=(10, 20))
 
         # graph lives in a Figure
-        self.fig = Figure(figsize=(10, 2), dpi=100)
-
+        self.fig = Figure(figsize=(10, 3), dpi=100)
         # Figures are drawn on Canvases
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
         # Canvases can be added to the grid
@@ -173,10 +171,10 @@ class PackageView(Frame):
     def update_graph(self):
         self.fig.clear()
         plots = []
-        for i in range(1, 4):
-            plots.append(self.fig.add_subplot(1, 3, i))
-            plots[i-1].set_frame_on(FALSE)
-            print(plots[i-1])
+        for i in range(0, 3):
+            plots.append(self.fig.add_subplot(1, 3, i+1))
+            plots[i].spines['right'].set_visible(False)
+            plots[i].spines['top'].set_visible(False)
         times_x = [j.q_id for j in self.stats_table.data]
         times_y = [j.times for j in self.stats_table.data]
         plots[0].boxplot(times_y, showfliers=False, positions=times_x)
@@ -191,7 +189,7 @@ class PackageView(Frame):
         plots[2].bar(skip_x, skip_y)
         plots[2].set_xticks(skip_x)
         plots[2].set_ylabel("% abandoned")
-
+        self.fig.tight_layout()
         self.canvas.draw()
 
 
@@ -201,10 +199,10 @@ class BottomButtons(Frame):
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        self.button = Button(self, text="Export as CSV")
+        self.button = Button(self, text="Export event statistics as CSV")
         self.button.grid(row=3, column=0, sticky="e")
-        self.button_two = Button(self, text="Export HTML report")
-        self.button_two.grid(row=3, column=1, sticky="w")
+        # self.button_two = Button(self, text="Export HTML report")
+        # self.button_two.grid(row=3, column=1, sticky="w")
 
 
 class Statistics(Page):
@@ -234,7 +232,7 @@ class Statistics(Page):
         self.tabbed_section.grid(row=2, columnspan="3", padx=20, sticky="n")
         #
         self.buttons = BottomButtons(self)
-        self.buttons.grid(row=3, columnspan="3", sticky="n")
+        self.buttons.grid(row=3, columnspan="3", pady=10, sticky="n")
         self.update_ui()
 
     def update_ui(self, *args):

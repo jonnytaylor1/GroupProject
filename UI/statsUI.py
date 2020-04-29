@@ -1,10 +1,12 @@
 from tkinter import *
-from tkinter.ttk import Treeview, Notebook, Separator, Style
+from tkinter import filedialog
+from tkinter.ttk import Treeview, Notebook, Style
 from collections import namedtuple
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
+import csv as csv
 from typing import List
 
 from UI import *
@@ -14,11 +16,13 @@ from Quiz.statistics import Statistics as StatDB
 
 StatsCol = namedtuple("StatsCol", ["name", "heading", "type", "width", "anchor"])
 
+def total_times_shown(question):
+    return question.successes + question.failures + question.skips + question.abandons
+
 
 class StatsData:
     data = [data for data in StatDB().get_overall_stats()]
     dates = {q.created_at.date().isoformat(): q.created_at.date() for q in data}
-    print(dates)
 
     @classmethod
     def available_dates(cls):
@@ -45,8 +49,6 @@ class StatsData:
 
     @classmethod
     def get_data_for_date(cls, date):
-        for q in cls.data:
-            print(f"{q.created_at.date()} - {date}")
         return [q for q in cls.data if q.created_at.date() == date]
 
 
@@ -69,7 +71,6 @@ class StatsTable(Treeview):
         self.data = StatsData.get_data(self.date, self.package, quiz)
         self.insert_data()
         # initial sort by question number after creation, just in case
-        self.sort_column(self.table_columns[0], False)
 
     def create_table(self):
         """Creates the table and sets up the headings. Should only run once"""
@@ -88,15 +89,16 @@ class StatsTable(Treeview):
 
     def insert_data(self):
         for item in self.data:
-            total_times_shown = item.successes + item.failures + item.skips + item.abandons
+            total_times = total_times_shown(item)
             self.insert("", 0, text=f"{item.q_id}",
                         values=[f"{item.q_id}",
                                 f"{item.text}",
-                                f"{total_times_shown}",
+                                f"{total_times}",
                                 f"{sum(item.times) / len(item.times):.3f} s",
-                                f"{(item.successes / total_times_shown) * 100:.1f}%",
-                                f"{(item.skips / total_times_shown) * 100:.1f}%",
-                                f"{(item.abandons / total_times_shown) * 100:.1f}%"])
+                                f"{(item.successes / total_times) * 100:.1f}%",
+                                f"{(item.skips / total_times) * 100:.1f}%",
+                                f"{(item.abandons / total_times) * 100:.1f}%"])
+        self.sort_column(self.table_columns[0], False)
 
     # https://stackoverflow.com/questions/46618459/tkinter-treeview-column-sorting
     def sort_column(self, sort_col, reverse):
@@ -152,18 +154,16 @@ class PackageView(Frame):
         self.table_scrollbar.config(command=self.stats_table.yview)
 
         # FIXME: padding
-        self.stats_table.grid(row=2, column=1, columnspan=4, padx=(50, 0), pady=(10, 5))
-        self.table_scrollbar.grid(row=2, column=5, sticky="ns", padx=(0, 50), pady=(10, 5))
+        self.stats_table.grid(row=2, column=1, columnspan=4, padx=(50, 0), pady=(10, 20))
+        self.table_scrollbar.grid(row=2, column=5, sticky="ns", padx=(0, 50), pady=(10, 20))
 
         # graph lives in a Figure
-        self.fig = Figure(figsize=(4, 2), dpi=100)
-
+        self.fig = Figure(figsize=(10, 3), dpi=100)
         # Figures are drawn on Canvases
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
-        self.canvas.draw()
         # Canvases can be added to the grid
         # FIXME: padding
-        self.canvas.get_tk_widget().grid(row=4, column=1, columnspan=1, pady=(5, 10))
+        self.canvas.get_tk_widget().grid(row=4, column=1, columnspan=5, pady=(5, 10))
         self.update_table()
 
     def update_table(self, *args):
@@ -172,10 +172,26 @@ class PackageView(Frame):
 
     def update_graph(self):
         self.fig.clear()
-        self.bar_chart = self.fig.add_subplot(xlabel="Question Number", ylabel="Test", frame_on="false")
-        x = [i.q_id for i in self.stats_table.data]
-        y = [i.abandons for i in self.stats_table.data]
-        self.bar_chart.bar(x, y)
+        plots = []
+        for i in range(0, 3):
+            plots.append(self.fig.add_subplot(1, 3, i+1))
+            plots[i].spines['right'].set_visible(False)
+            plots[i].spines['top'].set_visible(False)
+        times_x = [j.q_id for j in self.stats_table.data]
+        times_y = [j.times for j in self.stats_table.data]
+        plots[0].boxplot(times_y, showfliers=False, positions=times_x)
+        plots[0].set_ylabel("Time to answer (s)")
+        success_x = [j.q_id for j in self.stats_table.data]
+        success_y = [(j.successes / total_times_shown(j)) * 100 for j in self.stats_table.data]
+        plots[1].bar(success_x, success_y)
+        plots[1].set_xticks(success_x)
+        plots[1].set_ylabel("% answered correctly")
+        skip_x = [j.q_id for j in self.stats_table.data]
+        skip_y = [(j.skips / total_times_shown(j)) * 100 for j in self.stats_table.data]
+        plots[2].bar(skip_x, skip_y)
+        plots[2].set_xticks(skip_x)
+        plots[2].set_ylabel("% abandoned")
+        self.fig.tight_layout()
         self.canvas.draw()
 
 
@@ -185,11 +201,6 @@ class BottomButtons(Frame):
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        self.button = Button(self, text="Export as CSV")
-        self.button.grid(row=3, column=0, sticky="e")
-        self.button_two = Button(self, text="Export HTML report")
-        self.button_two.grid(row=3, column=1, sticky="w")
-
 
 class Statistics(Page):
     """This class provides the statistics view, in table and graphical form"""
@@ -213,27 +224,38 @@ class Statistics(Page):
         s = Style(self)
         s.configure('flat.TNotebook', borderwidth=0)
         self.tabbed_section = Notebook(self, style="flat.TNotebook")
-        # create frames for tabs
-        # self.quiz_one = QuizView(self.tabbed_section, 1, borderwidth=0, highlightthickness=0)
-        # self.quiz_two = QuizView(self.tabbed_section, 2)
-        # # attach tabs
-        # self.tabbed_section.add(self.quiz_one, text="Multi-Choice")
-        # self.tabbed_section.add(self.quiz_two, text="Hangman")
-        #
+
         # # FIXME: padding
         self.tabbed_section.grid(row=2, columnspan="3", padx=20, sticky="n")
         #
-        self.buttons = BottomButtons(self)
-        self.buttons.grid(row=3, columnspan="3", sticky="n")
+        self.button = Button(self, text="Export event statistics as CSV", command=self.csv_export)
+        self.button.grid(row=3, columnspan="3", pady=10, sticky="n")
         self.update_ui()
 
     def update_ui(self, *args):
         new_date = StatsData.dates[self.date_to_view.get()]
-        print(f"date = {new_date}")
-        print(StatsData.packages_for_date(new_date))
         for tab in self.tabbed_section.tabs():
             self.tabbed_section.forget(tab)
 
         for package in StatsData.packages_for_date(new_date):
             test_tab = PackageView(self.tabbed_section, new_date, package)
             self.tabbed_section.add(test_tab, text=package)
+
+
+    def csv_export(self):
+        date = StatsData.dates[self.date_to_view.get()]
+
+        file_path = filedialog.asksaveasfilename(filetypes=(("CSV", ".csv"),), initialfile=date)
+
+        # code taken from https://docs.python.org/3/library/csv.html
+        if file_path:
+            with open(file_path, 'w', newline='') as csvfile:
+                csvwriter = csv.writer(csvfile, delimiter=',',
+                                        quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                csvwriter.writerow(("package name", "quiz", "question id", "question text",
+                                    "total times shown", "successful answers", "skips", "abandons"))
+                for package in StatsData.packages_for_date(date):
+                    for quiz in StatsData.quizzes_for_package(package, date):
+                        for q in StatsData.get_data(date, package, quiz):
+                            csvwriter.writerow((q.package_name, q.quiz, q.q_id, q.text,
+                                                total_times_shown(q), q.successes, q.skips, q.abandons))

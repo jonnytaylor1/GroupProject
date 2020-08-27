@@ -85,10 +85,10 @@ To change password:
 
 **Statistics Window**
 
-Click quiz name to get quiz data from different quizzes
-Click date dropdown to get quiz data from different dates
-Click radio buttons to get data from different quiz formats
-Click 'export event statistics as CSV' to download the current data into a CSV file
+* Click quiz name to get quiz data from different quizzes
+* Click date dropdown to get quiz data from different dates
+* Click radio buttons to get data from different quiz formats
+* Click 'export event statistics as CSV' to download the current data into a CSV file
 
 
 

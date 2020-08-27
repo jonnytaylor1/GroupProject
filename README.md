@@ -1,12 +1,13 @@
 # Group Project Coursework
 
-##About
+## About
+
 The aim of the group project was to develop a quiz application with two different quiz formats that children 
 could use during an open day. It was required that the teacher could create/edit/delete question packages and that
 they could assign these question packages to a quiz. It was also a requirement that the teacher could view statistics
 from all previous quizzes and find them by date.  
 
-##Installation and Setup
+## Installation and Setup
 
 1. Download or clone file
 2. Download Python 3.8.5
@@ -20,21 +21,21 @@ were some sections that didn't get completed due to time constraints. For exampl
 currently needs to be restarted to go from the teachers menu to the students menu. My section of the 
 coursework was the packages menu, parts of the questions menu and parts of the database design. 
 
-##Usage
+## Usage
 
-Navigating to each quiz
+**Navigating to Each Quiz**
 
 1. Click student
 2. Click on either quiz
 
-Navigating to the teachers menu
+**Navigating to The Teachers Menu**
 
 1. Click teacher
 2. Password = 'guess'
 
 The following windows can be accessed from the teachers menu
 
-Question packages window
+**Question Packages Window**
 
 To add a package: 
 1. click add new package
@@ -53,11 +54,11 @@ To assign a question package to a quiz format
 1. click the quiz format dropdown menu on the row of the package you want to assign
 2. select a quiz format
 
-Be aware that you can't assign more than one question package to the same quiz format
+**Be aware that you can't assign more than one question package to the same quiz format**
 
 To add/edit/delete/view questions in a package click 'edit package questions'
 
-Edit package questions window
+**Edit Package Questions Window**
 
 To add a question: 
 1. click add new question
@@ -74,7 +75,7 @@ To delete a question:
 
 Any updates made in the packages or questions menu will be reflected in the quiz's
 
-Settings window
+**Settings Window**
 
 To change password:
 1. input old password
@@ -82,7 +83,7 @@ To change password:
 3. input confirmation of new password
 4. click change password
 
-Statistics Window
+**Statistics Window**
 
 Click quiz name to get quiz data from different quizzes
 Click date dropdown to get quiz data from different dates

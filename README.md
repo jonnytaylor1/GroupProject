@@ -7,6 +7,8 @@ could use during an open day. It was required that the teacher could create/edit
 they could assign these question packages to a quiz. It was also a requirement that the teacher could view statistics
 from all previous quizzes and find them by date.  
 
+**My section of the coursework was the packages menu, parts of the questions menu and parts of the database design.**
+
 ## Installation and Setup
 
 1. Download or clone file
@@ -19,9 +21,6 @@ from all previous quizzes and find them by date.
 Please be aware that the coursework was mainly being marked based on functionality and there
 were some sections that didn't get completed due to time constraints. For example the application
 currently needs to be restarted to go from the teachers menu to the students menu. Also be aware that the application was developed for the Ubuntu operating system and coloured feedback during the quiz only works on this operating system.
-
-
-**My section of the coursework was the packages menu, parts of the questions menu and parts of the database design.**
 
 ## Usage
 

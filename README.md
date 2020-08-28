@@ -19,6 +19,8 @@ from all previous quizzes and find them by date.
 Please be aware that the coursework was mainly being marked based on functionality and there
 were some sections that didn't get completed due to time constraints. For example the application
 currently needs to be restarted to go from the teachers menu to the students menu. Also be aware that the application was developed for the Ubuntu operating system and coloured feedback during the quiz only works on this operating system.
+
+
 **My section of the coursework was the packages menu, parts of the questions menu and parts of the database design.**
 
 ## Usage
